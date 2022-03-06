@@ -1,0 +1,15 @@
+---
+id: "A unique identifying reference"
+description: "A short description shown at the top of the screen"
+size:
+  - width: 20
+  - height: 20
+objects:
+  door_1:
+    position:
+      - x: 19
+      - y: 10
+  id_of_another_object:
+    position:
+      - x: 12
+      - y: 5

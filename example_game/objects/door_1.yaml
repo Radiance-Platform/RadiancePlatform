@@ -1,0 +1,23 @@
+---
+id: "door_1"
+type: "door"
+icon: "X"
+state:
+  - unlocked:
+      default: false
+interactions:
+  activate:
+    - travel:
+        prereqs:
+          state:
+            - unlocked: true
+        destination: "room_2"
+  world:
+    - unlock_door:
+        affected_by:
+          - key_1
+        self_action:
+          set_state:
+            - unlocked: true
+        other_action:
+          consume_item: true

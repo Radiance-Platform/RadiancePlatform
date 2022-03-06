@@ -1,0 +1,7 @@
+---
+name: "Name of Game"
+description: "A short description about the game"
+author: “Whoever wrote the game”
+min_screen_size:
+  width: 80
+  height: 20
