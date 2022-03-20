@@ -34,15 +34,16 @@ impl Game {
     pub fn initialize(config_path:std::path::PathBuf) -> Game {
         println!("Initializing Game");
 
+        let game_data = config_parsers::process_configs(config_path);
+
         // Create a display object
         let screen = Screen::initialize();
 
-
-        let game_data = config_parsers::process_configs(config_path);
-
         let game_state = GameState {
             last_character_pressed: Ok(Event::Key(KeyCode::Enter.into())),
-            last_character_processed: true
+            last_character_processed: true,
+            pre_exit: false,
+            do_exit: false,
         };
 
         return Game{game_data, game_state, screen};
@@ -52,22 +53,30 @@ impl Game {
     pub fn start(&mut self) {
 
         println!("Starting game");
+        self.screen.draw(&self.game_data, &mut self.game_state);
         self.run();
 
     }
 
     /// Main Game Loop
     pub fn run(&mut self) {
-        self.screen.draw(&self.game_data, &mut self.game_state);
 
         // Blocking read
-        let event = read();
+        self.game_state.last_character_pressed = read();
+        self.game_state.last_character_processed = false;
 
-        self.run();
+        self.screen.draw(&self.game_data, &mut self.game_state);
+
+        if self.game_state.do_exit {
+            self.end();
+        } else {
+            self.run();
+        }
     }
 
     pub fn end(&self) {
-        self.screen.reset();
+        self.screen.end();
+        exit(0);
     }
 
 }
@@ -75,5 +84,7 @@ impl Game {
 /// The current state of a Game
 pub struct GameState {
     pub last_character_pressed: Result<Event>,
-    pub last_character_processed: bool
+    pub last_character_processed: bool,
+    pub pre_exit: bool,
+    pub do_exit: bool,
 }

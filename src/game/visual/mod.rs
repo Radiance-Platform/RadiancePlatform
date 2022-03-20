@@ -13,7 +13,7 @@ use crossterm::{
     cursor::{MoveTo}
 };
 use crossterm::event::{Event, KeyCode, KeyEvent};
-use crossterm::terminal::enable_raw_mode;
+use crossterm::terminal::{disable_raw_mode, enable_raw_mode};
 
 pub struct Screen {
     original_columns: u16,
@@ -56,13 +56,14 @@ impl Screen {
         };
 
         // Turn on raw mode for proper keyboard input access
-
         match enable_raw_mode() {
             Err(_) => {
                 println!("ERROR: Unable to enable raw terminal mode for input, please try another terminal");
                 exit(1);
             },
-            _ => {}
+            _ => {
+                println!("Raw terminal mode enabled");
+            }
         }
 
         return screen;
@@ -75,6 +76,7 @@ impl Screen {
         // Loop over each row (hard set to 20 for now, TODO: Allow dynamic sizing)
         for r in 0..20 {
             // Loop over each column (hard set to 80 for now, TODO: Allow dynamic sizing)
+            stdout().execute(MoveTo(0, r))?;
             for c in 0..80 {
                 if r == 0 || r == 19 {
                     if c == 0 || c == 79 {
@@ -138,8 +140,8 @@ impl Screen {
             }.into();*/
 
             let char2 = match game_state.last_character_pressed.as_ref().unwrap() {
-                Event::Key(X) => {
-                    X.code
+                Event::Key(x) => {
+                    x.code
                 },
                 _ => { KeyCode::Null }
             };
@@ -147,9 +149,32 @@ impl Screen {
             execute!(
                 stdout(),
                 MoveTo(10, 10),
-                Print("Event: "),
+                Print("Received character: "),
                 Print(format!("{:?}", char2)),
             )?;
+
+            if char2 == KeyCode::Char('C') {
+                execute!(
+                    stdout(),
+                    MoveTo(10, 11),
+                    Print("Would you like to exit? Y/N")
+                )?;
+                game_state.pre_exit = true;
+
+            } else if game_state.pre_exit {
+                if char2 == KeyCode::Char('Y') {
+                    game_state.do_exit = true;
+                } else {
+                    execute!(
+                        stdout(),
+                        MoveTo(10, 11),
+                        Print("Exit aborted")
+                    )?;
+                    game_state.pre_exit = false;
+                }
+            }
+
+
             game_state.last_character_processed = true;
         }
 
@@ -160,8 +185,25 @@ impl Screen {
         Ok(())
     }
 
+
+    pub fn end(&self) -> Result<()> {
+
+        self.draw_border()?;
+        execute!(
+                stdout(),
+                MoveTo(10, 10),
+                Print("Shutting down, goodbye!"),
+                MoveTo(0, 20),
+            )?;
+
+        self.reset()?;
+
+        Ok(())
+    }
+
     pub fn reset(&self) -> Result<()> {
         // Be a good citizen and cleanup the terminal for program exit
+        disable_raw_mode()?;
         execute!(stdout(), SetSize(self.original_columns, self.original_rows))?;
         Ok(())
     }
