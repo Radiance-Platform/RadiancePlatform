@@ -27,4 +27,5 @@ fn main() {
 
     let mut g = game::Game::initialize(args.config_path);
     g.start();
+    g.end();
 }

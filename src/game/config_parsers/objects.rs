@@ -1,0 +1,10 @@
+
+
+
+struct Object {
+
+}
+
+impl Object {
+
+}
