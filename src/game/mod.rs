@@ -1,19 +1,13 @@
-use std::path::PathBuf;
 use std::process::exit;
-use std::ptr::null;
 use config_parsers::GameData;
-use crate::game::visual::Screen;
+use crate::game::visual::{Screen, VisualStates};
 
-use crossterm::event::poll;
 use crossterm::{
-    cursor::position,
     event::{read, DisableMouseCapture, EnableMouseCapture, Event, KeyCode},
     execute,
     terminal::{disable_raw_mode, enable_raw_mode},
     Result,
 };
-use std::time::Duration;
-
 
 pub mod characters;
 pub mod maps;
@@ -44,6 +38,7 @@ impl Game {
             last_character_processed: true,
             pre_exit: false,
             do_exit: false,
+            visual_state: VisualStates::StartScreen,
         };
 
         return Game{game_data, game_state, screen};
@@ -53,7 +48,13 @@ impl Game {
     pub fn start(&mut self) {
 
         println!("Starting game");
-        self.screen.draw(&self.game_data, &mut self.game_state);
+        match self.screen.draw(&self.game_data, &mut self.game_state) {
+            Ok(_) => {},
+            Err(_) => {
+                println!("ERROR: Problem encountered while drawing screen, exiting!");
+                self.end();
+            }
+        }
         self.run();
 
     }
@@ -65,7 +66,13 @@ impl Game {
         self.game_state.last_character_pressed = read();
         self.game_state.last_character_processed = false;
 
-        self.screen.draw(&self.game_data, &mut self.game_state);
+        match self.screen.draw(&self.game_data, &mut self.game_state) {
+            Ok(_) => {},
+            Err(_) => {
+                println!("ERROR: Problem encountered while drawing screen, exiting!");
+                self.end();
+            }
+        }
 
         if self.game_state.do_exit {
             self.end();
@@ -75,7 +82,7 @@ impl Game {
     }
 
     pub fn end(&self) {
-        self.screen.end();
+        let _ = self.screen.end();
         exit(0);
     }
 
@@ -87,4 +94,5 @@ pub struct GameState {
     pub last_character_processed: bool,
     pub pre_exit: bool,
     pub do_exit: bool,
+    pub visual_state: VisualStates,
 }

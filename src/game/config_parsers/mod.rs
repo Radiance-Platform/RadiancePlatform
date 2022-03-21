@@ -12,18 +12,18 @@ mod maps;
 mod objects;
 
 pub struct GameInfo {
-    name: String,
-    description: String,
-    author: String,
-    min_screen_cols: u16,
-    min_screen_rows: u16,
+    pub name: String,
+    pub description: String,
+    pub author: String,
+    pub min_screen_cols: u16,
+    pub min_screen_rows: u16,
 }
 
 pub struct GameData {
-    maps: Vec<Map>,
-    characters: Vec<Character>,
-    objects: Vec<Object>,
-    info: GameInfo,
+    pub maps: Vec<Map>,
+    pub characters: Vec<Character>,
+    pub objects: Vec<Object>,
+    pub info: GameInfo,
 }
 
 impl GameData {

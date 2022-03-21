@@ -18,7 +18,8 @@ pub fn process_config(game_data: &mut GameData, config_path: &Path) -> Result<()
     println!("{:?}", doc);
 
     // Todo: Parse fields
-    game_data.info.name = "".to_string();
+    game_data.info.name = "The Radiance Platform Demo Game".to_string();
+    game_data.info.author = "The Radiance Team".to_string();
     // ...
 
     Ok(())
