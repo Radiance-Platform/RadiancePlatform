@@ -1,0 +1,12 @@
+---
+id: "key"
+type: "usable"
+icon: "K"
+state:
+interactions:
+  world:
+    - unlock_door:
+        affects:
+          - door_1
+        self_action:
+          consume_item: true

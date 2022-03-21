@@ -1,15 +1,15 @@
 use crate::game::characters::attribute::Attribute;
 use crate::game::characters::role::Role;
 
-mod role;
-mod attribute;
+pub mod role;
+pub mod attribute;
 
 
 
 pub struct Character {
-    name: String,
-    role: Role,
-    traits: Vec<Attribute>,
+    pub name: String,
+    pub role: Role,
+    pub traits: Vec<Attribute>,
 }
 
 impl Character {

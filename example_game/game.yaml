@@ -1,7 +1,7 @@
 ---
-name: "Name of Game"
-description: "A short description about the game"
-author: “Whoever wrote the game”
+name: "Radiance Example Game"
+description: "This is a small game to demonstrate the Radiance Platform's capabilities."
+author: "The Radiance Team"
 min_screen_size:
   width: 80
   height: 20

@@ -1,0 +1,15 @@
+---
+id: "basement"
+description: "Welcome to the spooky basement O.O"
+size:
+  - width: 20
+  - height: 10
+objects:
+  door_1:
+    position:
+      - x: 5
+      - y: 0
+  table:
+    position:
+      - x: 12
+      - y: 5

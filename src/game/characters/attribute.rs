@@ -1,8 +1,8 @@
 
 
 pub struct Attribute {
-    name: String,
-    min_val: u8,
-    max_val: u8,
-    current_val: u8
+    pub name: String,
+    pub min_val: u8,
+    pub max_val: u8,
+    pub current_val: u8
 }

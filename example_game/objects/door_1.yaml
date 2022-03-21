@@ -11,11 +11,11 @@ interactions:
         prereqs:
           state:
             - unlocked: true
-        destination: "room_2"
+        destination: "basement"
   world:
     - unlock_door:
         affected_by:
-          - key_1
+          - key
         self_action:
           set_state:
             - unlocked: true

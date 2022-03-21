@@ -1,0 +1,6 @@
+---
+id: "key"
+type: "collectable"
+icon: "^"
+state:
+interactions:

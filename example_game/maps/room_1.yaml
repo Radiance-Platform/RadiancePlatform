@@ -1,15 +1,19 @@
 ---
-id: "A unique identifying reference"
-description: "A short description shown at the top of the screen"
+id: "Main Room"
+description: "Welcome to the main room, where you can get to everywhere else. Try going somewhere else."
 size:
   - width: 20
   - height: 20
 objects:
   door_1:
     position:
-      - x: 19
+      - x: 10
+      - y: 19
+  door_2:
+    position:
+      - x: 0
       - y: 10
-  id_of_another_object:
+  hat:
     position:
       - x: 12
       - y: 5
