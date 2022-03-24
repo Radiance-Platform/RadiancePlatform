@@ -1,38 +1,39 @@
 ---
 id: "enemy_1"
+name: "Enemy 1"
 inventory_size:
-  - width: 3
-  - height: 3
+  width: 3
+  height: 3
 traits:
-  - health:
-      display_name: “Health”
-      starting_value: 100
-      max_value: 100
-  - skill_1:
-      display_name: “Skill 1”
-      starting_value: 1
-      max_value: 10
-  - skill_2:
-      display_name: “Skill 2”
-      starting_value: 5
-      max_value: 10
-  - skill_3:
-      display_name: “Skill 3”
-      starting_value: 7
-      max_value: 10
-  - super_skill_thing:
-      display_name: “Super Skill Thing”
-      starting_value: 1
-      max_value: 10
+  - name: "health"
+    display_name: "Health"
+    starting_value: 100
+    max_value: 100
+  - name: "skill_1"
+    display_name: "Skill 1"
+    starting_value: 1
+    max_value: 10
+  - name: "skill_2"
+    display_name: "Skill 2"
+    starting_value: 5
+    max_value: 10
+  - name: "skill_3"
+    display_name: "Skill 3"
+    starting_value: 7
+    max_value: 10
+  - name: "super_skill_thing"
+    display_name: "Super Skill Thing"
+    starting_value: 1
+    max_value: 10
 interactions:
   attacks:
-    - throw_stick:
-        display_name: “Throw stick”
-        base_damage: 5
-        affected_by:
-          - skill_1:
-              effect_per_point: "+1"
-          - skill_2:
-              effect_per_point: "-1"
-          - skill_3:
-              effect_per_point: "*1.2"
+    - name: "throw_stick"
+      display_name: "Throw stick"
+      base_damage: 5
+      affected_by:
+        - skill: "skill_1"
+          effect_per_point: "+1"
+        - skill: "skill_2"
+          effect_per_point: "-1"
+        - skill: "skill_3"
+          effect_per_point: "*1.2"

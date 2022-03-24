@@ -2,18 +2,22 @@
 id: "Main Room"
 description: "Welcome to the main room, where you can get to everywhere else. Try going somewhere else."
 size:
-  - width: 20
-  - height: 20
+  width: 20
+  height: 20
 objects:
-  door_1:
+  - id: "door_1"
     position:
-      - x: 10
-      - y: 19
-  door_2:
+      x: 10
+      y: 19
+  - id: "door_2"
     position:
-      - x: 0
-      - y: 10
-  hat:
+      x: 0
+      y: 10
+  - id: "hat"
     position:
-      - x: 12
-      - y: 5
+      x: 12
+      y: 5
+  - id: "hat"
+    position:
+      x: 13
+      y: 6

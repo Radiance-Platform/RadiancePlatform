@@ -1,23 +1,25 @@
 ---
 id: "door_1"
+name: "Door"
 type: "door"
 icon: "X"
 state:
-  - unlocked:
-      default: false
+  - id: "unlocked"
+    default: false
 interactions:
   activate:
-    - travel:
-        prereqs:
-          state:
-            - unlocked: true
-        destination: "basement"
+    - type: "travel"
+      prereqs:
+        state:
+          - id: "unlocked"
+            value: true
+      destination: "basement"
   world:
-    - unlock_door:
-        affected_by:
-          - key
-        self_action:
-          set_state:
-            - unlocked: true
-        other_action:
-          consume_item: true
+    - type: "unlock_door"
+      affected_by:
+        - id: "key"
+      self_action:
+        set_state:
+          - unlocked: true
+      other_action:
+        consume_item: true

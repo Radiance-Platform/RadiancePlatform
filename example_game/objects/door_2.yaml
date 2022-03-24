@@ -1,14 +1,16 @@
 ---
 id: "door_2"
+name: "Door"
 type: "door"
 icon: "X"
 state:
-  - unlocked:
-      default: true
+  - id: "unlocked"
+    default: true
 interactions:
   activate:
-    - travel:
-        prereqs:
-          state:
-            - unlocked: true
-        destination: "room_2"
+    - type: "travel"
+      prereqs:
+        state:
+          - id: "unlocked"
+            value: true
+      destination: "room_2"

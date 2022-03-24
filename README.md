@@ -16,6 +16,7 @@ https://crates.io/crates/yaml-rust
 https://docs.rs/yaml-rust/0.4.5/yaml_rust/
 https://github.com/chyh1990/yaml-rust
 https://crates.io/crates/walkdir
+https://medium.com/@otukof/build-your-text-editor-with-rust-part-2-74e03daef237
 
 
 

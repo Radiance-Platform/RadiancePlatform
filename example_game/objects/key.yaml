@@ -5,8 +5,8 @@ icon: "K"
 state:
 interactions:
   world:
-    - unlock_door:
-        affects:
-          - door_1
-        self_action:
-          consume_item: true
+    - type: "unlock_door"
+      affects:
+        - id: "door_1"
+      self_action:
+        consume_item: true
