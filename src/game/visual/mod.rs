@@ -36,7 +36,7 @@ pub struct Screen {
 impl Screen {
 
     fn check_screen_size() -> Result<()> {
-        let error_terminal_too_small = Error::new(ErrorKind::Other, "Terminal size is too small");
+        let error_terminal_too_small = Error::new(ErrorKind::Other, "Terminal size is too small, must be at least 80x20");
         let (cols, rows) = size()?;
         return if cols < 80 || rows < 20 {
             Err(error_terminal_too_small)
