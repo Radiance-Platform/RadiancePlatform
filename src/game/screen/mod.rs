@@ -127,21 +127,20 @@ impl Screen {
         Ok(())
     }
 
-    fn draw_border(&self) -> Result<()> {
-
-        // Loop over each row (hard set to 20 for now, TODO: Allow dynamic sizing
-        for r in 0..20 {
-            // Loop over each column (hard set to 80 for now, TODO: Allow dynamic sizing
-            stdout().execute(MoveTo(0, r))?;
-            for c in 0..80 {
-                if r == 0 || r == 19 {
-                    if c == 0 || c == 79 {
+    fn draw_border(&self, start_col: u16, start_row: u16, cols: u16, rows: u16) -> Result<()> {
+        // Loop over each row
+        for r in start_row..start_row+rows {
+            // Loop over each column
+            stdout().execute(MoveTo(start_col, r))?;
+            for c in start_col..start_col+cols {
+                if r == start_row || r == start_row+rows-1 {
+                    if c == start_col || c == start_col+cols-1 {
                         stdout().execute(Print("+"))?;
                     } else {
                         stdout().execute(Print("-"))?;
                     }
                 } else {
-                    if c == 0 || c == 79 {
+                    if c == start_col || c == start_col+cols-1 {
                         stdout().execute(Print("|"))?;
                     } else {
                         stdout().execute(Print(" "))?;
@@ -155,7 +154,7 @@ impl Screen {
 
     // TODO: Implementation, documentation
     fn draw_start_screen(&self, game_data: &GameData, game_state: &mut GameState) -> Result<()> {
-
+        self.draw_border(0, 0, 80, 20)?;
         // Print game info
         execute!(
                 stdout(),
@@ -227,6 +226,26 @@ impl Screen {
                     )?;
                     game_state.pre_exit = false;
                 }
+            } else if keycode == KeyCode::Char('M') {
+
+                // Change to map view
+                game_state.visual_state = VisualStates::PlayingMap;
+                execute!(
+                        stdout(),
+                        MoveTo(10, 11),
+                        Print("Changing to map view")
+                    )?;
+
+            } else if keycode == KeyCode::Char('D') {
+
+                // Change to dialog view
+                game_state.visual_state = VisualStates::PlayingDialog;
+                execute!(
+                        stdout(),
+                        MoveTo(10, 11),
+                        Print("Changing to dialog view")
+                    )?;
+
             }
 
             game_state.last_character_processed = true;
@@ -239,12 +258,154 @@ impl Screen {
 
     // TODO: Implementation, documentation
     fn draw_playing_map(&self, game_data: &GameData, game_state: &mut GameState) -> Result<()> {
+        execute!(
+            stdout(),
+            MoveTo(2, 1),
+            Print("Map View")
+        )?;
+
+        if !game_state.last_character_processed {
+
+            let keycode = match game_state.last_character_pressed.as_ref().unwrap() {
+                Event::Key(x) => {
+                    x.code
+                },
+                _ => { KeyCode::Null }
+            };
+
+            // Process exiting the game
+            // TODO: Add processing for other key presses here
+            // For example, control+C via something like
+            // game_state.last_character_pressed.as_ref().unwrap().modifiers == KeyModifiers::CONTROL && keycode == KeyCode::Char('C')
+            if keycode == KeyCode::Char('C') {
+                execute!(
+                    stdout(),
+                    MoveTo(10, 11),
+                    Print("Would you like to exit? Y/N")
+                )?;
+                game_state.pre_exit = true;
+
+            } else if game_state.pre_exit {
+                if keycode == KeyCode::Char('Y') {
+                    game_state.do_exit = true;
+                } else {
+                    execute!(
+                        stdout(),
+                        MoveTo(10, 11),
+                        Print("Exit aborted")
+                    )?;
+                    game_state.pre_exit = false;
+                }
+            } else if keycode == KeyCode::Char('H') {
+
+                // Change to map view
+                game_state.visual_state = VisualStates::StartScreen;
+                execute!(
+                        stdout(),
+                        MoveTo(10, 11),
+                        Print("Changing to start screen")
+                    )?;
+
+            } else if keycode == KeyCode::Char('D') {
+
+                // Change to dialog view
+                game_state.visual_state = VisualStates::PlayingDialog;
+                execute!(
+                        stdout(),
+                        MoveTo(10, 11),
+                        Print("Changing to dialog view")
+                    )?;
+
+            }
+
+            game_state.last_character_processed = true;
+        }
 
         Ok(())
     }
 
     // TODO: Implementation, documentation
     fn draw_playing_dialog(&self, game_data: &GameData, game_state: &mut GameState) -> Result<()> {
+        execute!(
+            stdout(),
+            MoveTo(2, 1),
+            Print("Dialog View")
+        )?;
+
+        // Draw dialog box border
+        self.draw_border(15, 4, 50, 12)?;
+        // Draw buttons border
+        self.draw_border(15, 14, 50, 3)?;
+        // Split into 2 buttons
+        self.draw_border(15, 14, 25, 3)?;
+
+        // Sample text and buttons
+        execute!(
+            stdout(),
+            MoveTo(17, 5),
+            Print("Test dialog message"),
+            MoveTo(27, 15),
+            Print("Ok"),
+            MoveTo(49, 15),
+            Print("Cancel"),
+        )?;
+
+        if !game_state.last_character_processed {
+
+            let keycode = match game_state.last_character_pressed.as_ref().unwrap() {
+                Event::Key(x) => {
+                    x.code
+                },
+                _ => { KeyCode::Null }
+            };
+
+            // Process exiting the game
+            // TODO: Add processing for other key presses here
+            // For example, control+C via something like
+            // game_state.last_character_pressed.as_ref().unwrap().modifiers == KeyModifiers::CONTROL && keycode == KeyCode::Char('C')
+            if keycode == KeyCode::Char('C') {
+                execute!(
+                    stdout(),
+                    MoveTo(10, 11),
+                    Print("Would you like to exit? Y/N")
+                )?;
+                game_state.pre_exit = true;
+
+            } else if game_state.pre_exit {
+                if keycode == KeyCode::Char('Y') {
+                    game_state.do_exit = true;
+                } else {
+                    execute!(
+                        stdout(),
+                        MoveTo(10, 11),
+                        Print("Exit aborted")
+                    )?;
+                    game_state.pre_exit = false;
+                }
+            } else if keycode == KeyCode::Char('H') {
+
+                // Change to map view
+                game_state.visual_state = VisualStates::StartScreen;
+                execute!(
+                        stdout(),
+                        MoveTo(10, 11),
+                        Print("Changing to start screen")
+                    )?;
+
+            } else if keycode == KeyCode::Char('M') {
+
+                // Change to map view
+                game_state.visual_state = VisualStates::PlayingMap;
+                execute!(
+                        stdout(),
+                        MoveTo(10, 11),
+                        Print("Changing to map view")
+                    )?;
+
+            }
+
+            game_state.last_character_processed = true;
+        }
 
         Ok(())
     }
@@ -270,7 +431,7 @@ impl Screen {
     // TODO: Documentation
     pub fn draw(&self, game_data: &GameData, game_state: &mut GameState) -> Result<()> {
 
-        self.draw_border()?;
+        //self.draw_border(0, 0, 80, 20)?;
 
         match game_state.visual_state {
             VisualStates::StartScreen => {
