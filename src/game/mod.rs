@@ -1,14 +1,14 @@
 use std::process::exit;
 use std::time::Duration;
 use config_parsers::GameData;
-use crate::game::visual::{Screen, VisualStates};
+use crate::game::screen::{Screen, VisualStates};
 
 use crossterm::{event::{read, DisableMouseCapture, EnableMouseCapture, Event, KeyCode}, execute, terminal::{disable_raw_mode, enable_raw_mode}, Result, event};
 
 pub mod characters;
 pub mod maps;
 pub mod objects;
-pub mod visual;
+pub mod screen;
 pub mod config_parsers;
 
 /// The base Game struct that contains all configuration for the game, but not any of its current state
@@ -57,14 +57,13 @@ impl Game {
     }
 
     /// Main Game Loop
-    pub fn run(&mut self) {
+    fn run(&mut self) {
 
         // Blocking read
         //self.game_state.last_character_pressed = read();
 
-
-        if event::poll(Duration::from_millis(1000)).expect("Error") {
-            self.game_state.last_character_pressed = event::read();
+        if crossterm::event::poll(std::time::Duration::from_millis(1000)).expect("Error") {
+            self.game_state.last_character_pressed = crossterm::event::read();
             self.game_state.last_character_processed = false;
         }
 
@@ -84,7 +83,7 @@ impl Game {
         }
     }
 
-    pub fn end(&self) {
+    fn end(&self) {
         let _ = self.screen.end();
         exit(0);
     }

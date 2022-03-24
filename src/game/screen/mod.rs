@@ -13,7 +13,6 @@ use crossterm::{
     cursor::{MoveTo}
 };
 use crossterm::cursor::{DisableBlinking, EnableBlinking, Hide, SetCursorShape, Show};
-use crossterm::cursor::CursorShape;
 use crossterm::event::{Event, KeyCode, KeyEvent, KeyModifiers};
 use crossterm::terminal::{disable_raw_mode, enable_raw_mode, Clear, ClearType};
 
