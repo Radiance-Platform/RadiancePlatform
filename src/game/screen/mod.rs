@@ -466,7 +466,7 @@ impl Screen {
         Ok(())
     }
 
-    pub fn reset(&self) -> Result<()> {
+    fn reset(&self) -> Result<()> {
         // Be a good citizen and cleanup the terminal for program exit
 
         // Get rid of raw mode
