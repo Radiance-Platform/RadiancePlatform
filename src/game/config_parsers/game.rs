@@ -15,12 +15,22 @@ pub fn process_config(game_data: &mut GameData, config_path: &Path) -> Result<()
     let doc = &docs[0];
 
     // Debug print
-    println!("{:?}", doc);
+    println!("GAME DOC: {:?}\n", doc);
+
+    let game_data_hash = doc.as_hash().unwrap();
+
+    let key = yaml_rust::Yaml::from_str("name");
+    let name = game_data_hash.get(&key).unwrap_or(&key).as_str().unwrap();
+
+    println!("GAME NAME: {:?}\n", name);
 
     // Todo: Parse fields
-    game_data.info.name = "The Radiance Platform Demo Game".to_string();
+    game_data.info.name = name.to_string();
     game_data.info.author = "The Radiance Team".to_string();
     // ...
 
     Ok(())
 }
+
+/* TO DO: Add function that takes the name of the yaml field and returns the data
+   associated with it completely unpacked as a string */
