@@ -1,7 +1,7 @@
 use std::error::Error;
 use std::fs;
 use std::path::Path;
-use yaml_rust::YamlLoader;
+use yaml_rust::{YamlLoader,Yaml};
 use crate::game::config_parsers::GameData;
 use crate::game::maps::Map;
 
@@ -16,7 +16,7 @@ pub fn process_config(game_data: &mut GameData, config_path: &Path) -> Result<()
     let doc = &docs[0];
 
     // Debug print
-    println!("{:?}", doc);
+    println!("Map YAML:\n{:?}", doc);
 
     // Todo: Parse fields
     let map = Map{ grid: vec![] };
