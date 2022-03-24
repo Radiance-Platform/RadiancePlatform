@@ -1,13 +1,9 @@
 use std::process::exit;
+use std::time::Duration;
 use config_parsers::GameData;
 use crate::game::visual::{Screen, VisualStates};
 
-use crossterm::{
-    event::{read, DisableMouseCapture, EnableMouseCapture, Event, KeyCode},
-    execute,
-    terminal::{disable_raw_mode, enable_raw_mode},
-    Result,
-};
+use crossterm::{event::{read, DisableMouseCapture, EnableMouseCapture, Event, KeyCode}, execute, terminal::{disable_raw_mode, enable_raw_mode}, Result, event};
 
 pub mod characters;
 pub mod maps;
@@ -39,6 +35,7 @@ impl Game {
             pre_exit: false,
             do_exit: false,
             visual_state: VisualStates::StartScreen,
+            cursor_blink: false,
         };
 
         return Game{game_data, game_state, screen};
@@ -63,8 +60,14 @@ impl Game {
     pub fn run(&mut self) {
 
         // Blocking read
-        self.game_state.last_character_pressed = read();
-        self.game_state.last_character_processed = false;
+        //self.game_state.last_character_pressed = read();
+
+
+        if event::poll(Duration::from_millis(1000)).expect("Error") {
+            self.game_state.last_character_pressed = event::read();
+            self.game_state.last_character_processed = false;
+        }
+
 
         match self.screen.draw(&self.game_data, &mut self.game_state) {
             Ok(_) => {},
@@ -95,4 +98,5 @@ pub struct GameState {
     pub pre_exit: bool,
     pub do_exit: bool,
     pub visual_state: VisualStates,
+    pub cursor_blink: bool,
 }

@@ -113,6 +113,21 @@ impl Screen {
         return 0;
     }
 
+    // Test function to use for making sure I can blink the cursor like when a character is over
+    // another object
+    fn blink_cursor(&self, game_state: &mut GameState) -> Result<()> {
+        stdout().execute(MoveTo(78, 18))?;
+        if game_state.cursor_blink {
+            stdout().execute(Print("X"))?;
+        } else {
+            stdout().execute(Print("O"))?;
+        }
+
+        game_state.cursor_blink = !game_state.cursor_blink;
+
+        Ok(())
+    }
+
     fn draw_border(&self) -> Result<()> {
 
         // Loop over each row (hard set to 20 for now, TODO: Allow dynamic sizing
@@ -171,6 +186,17 @@ impl Screen {
 
             //let keycode2 = game_state.last_character_pressed.as_ref().unwrap();
 
+            // Something to look into
+            /* match event {
+                    KeyEvent {
+                        code: KeyCode::Char('q'),
+                        modifiers: event::KeyModifiers::NONE,
+                    } => break,
+                    _ => {
+                    }
+                }
+             */
+
             execute!(
                 stdout(),
                 MoveTo(10, 10),
@@ -206,6 +232,8 @@ impl Screen {
 
             game_state.last_character_processed = true;
         }
+
+        self.blink_cursor(game_state)?;
 
         Ok(())
     }
