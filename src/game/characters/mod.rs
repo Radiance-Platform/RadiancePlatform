@@ -9,7 +9,7 @@ pub mod attribute;
 pub struct Character {
     pub name: String,
     pub role: Role,
-    pub traits: Vec<Attribute>,
+    pub attributes: Vec<Attribute>,
 }
 
 impl Character {

@@ -1,8 +1,9 @@
-
+use crate::game::characters::Character;
+use crate::game::objects::Object;
 
 pub enum MapData {
-    Character(),
-    Object()
+    Character(Character),
+    Object(Object)
 }
 
 pub struct Map {

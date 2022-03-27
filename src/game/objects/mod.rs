@@ -5,9 +5,9 @@ pub struct ObjectState {
     pub value: bool
 }
 
-pub struct ObjectInteractions {
+pub struct ObjectInteraction {
     pub name: String,
-    pub values: Vec<String>
+    pub values: String
 }
 
 pub struct Object {
@@ -16,7 +16,7 @@ pub struct Object {
     pub category: String,
     pub icon: char,
     pub state: Vec<ObjectState>,
-    pub interactions: Vec<ObjectInteractions>,
+    pub interactions: Vec<ObjectInteraction>,
 }
 
 impl Object {
