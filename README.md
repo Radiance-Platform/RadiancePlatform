@@ -12,11 +12,16 @@ https://github.com/crossterm-rs/crossterm/tree/master/examples
 https://rustrepo.com/repo/pyros2097-rust-embed-rust-web
 https://crates.io/crates/clap
 https://github.com/clap-rs/clap/tree/master/examples
+https://crates.io/crates/walkdir
+https://medium.com/@otukof/build-your-text-editor-with-rust-part-2-74e03daef237
+
+## Yaml/Serde
 https://crates.io/crates/yaml-rust
 https://docs.rs/yaml-rust/0.4.5/yaml_rust/
 https://github.com/chyh1990/yaml-rust
-https://crates.io/crates/walkdir
-https://medium.com/@otukof/build-your-text-editor-with-rust-part-2-74e03daef237
+
+Useful for serializing the YAML data into Rust Structs
+https://transform.tools/json-to-rust-serde
 
 
 
