@@ -1,6 +1,6 @@
 use serde::{Serialize,Deserialize};
 use crate::game::characters::Character;
-use crate::game::objects::Object;
+//use crate::game::objects::Object;
 
 pub enum MapData {
     Character(Character),
