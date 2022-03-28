@@ -1,4 +1,4 @@
-
+use serde::{Serialize,Deserialize};
 
 pub enum MapData {
     Character(),
@@ -7,4 +7,34 @@ pub enum MapData {
 
 pub struct Map {
     pub grid: Vec<Vec<Option<MapData>>>
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct MapItemData {
+    pub id: String,
+    pub description: String,
+    pub size: Size,
+    pub objects: Vec<Object>,
+}
+
+#[derive(Debug,Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Size {
+    pub width: i64,
+    pub height: i64,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Object {
+    pub id: String,
+    pub position: Position,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Position {
+    pub x: i64,
+    pub y: i64,
 }

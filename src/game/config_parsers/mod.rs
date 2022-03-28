@@ -75,7 +75,7 @@ impl GameData {
                 if let Some(parent) = parent_opt {
                     // Then check it against our valid parents
                     match parent {
-                        "maps" => { maps::process_config(self, entry.path()); }
+                        "maps" => { maps::process_config_serde(self, entry.path()); }
                         "characters" => { characters::process_config(self, entry.path()); }
                         "objects" => { objects::process_config(self, entry.path()); }
                         _ => { println!("Found unknown file '{:?}', ignoring", entry.path())}
