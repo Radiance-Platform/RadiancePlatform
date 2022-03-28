@@ -6,8 +6,21 @@ pub struct ObjectState {
 }
 
 pub struct ObjectInteraction {
-    pub name: String,
+    pub category: ObjectInteractionCategory,
     pub values: String
+}
+
+pub enum ObjectInteractionCategory {
+    ObjectInteractionActivate(ObjectInteractionActivate),
+    ObjectInteractionWorld(ObjectInteractionWorld)
+}
+
+pub struct ObjectInteractionActivate {
+
+}
+
+pub struct ObjectInteractionWorld {
+
 }
 
 pub struct Object {

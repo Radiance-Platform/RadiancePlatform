@@ -2,14 +2,14 @@
 id: "basement"
 description: "Welcome to the spooky basement O.O"
 size:
-  - width: 20
-  - height: 10
+  width: 20
+  height: 10
 objects:
-  door_1:
+  - id: "door_1"
     position:
-      - x: 5
-      - y: 0
-  table:
+      x: 5
+      y: 0
+  - id: "table"
     position:
-      - x: 12
-      - y: 5
+      x: 12
+      y: 5

@@ -4,6 +4,7 @@ use std::path::{Component, Path};
 use std::path::Component::Normal;
 use walkdir::WalkDir;
 use crate::game::characters::Character;
+use crate::game::maps::MapData::Character;
 use crate::game::objects::Object;
 
 mod characters;
@@ -21,8 +22,6 @@ pub struct GameInfo {
 
 pub struct GameData {
     pub maps: Vec<Map>,
-    pub characters: Vec<Character>,
-    pub objects: Vec<Object>,
     pub info: GameInfo,
 }
 
@@ -32,8 +31,6 @@ impl GameData {
 
         let mut game_data = GameData{
             maps: Vec::new(),
-            characters: Vec::new(),
-            objects: Vec::new(),
             info: GameInfo{
                 name: "".to_string(),
                 description: "".to_string(),
@@ -49,6 +46,11 @@ impl GameData {
     }
 
     fn scan_config(&mut self, config_path: std::path::PathBuf) {
+
+        // As the configs are read, everything is thrown in these vectors, then after all are read, they get put into the actual map objects
+        //let characters = Vec<Character>();
+
+        // TODO: Ensure that the maps are read last so that objects/characters can then be stored in the map
 
         // Loop over every file in the provided folder
         for entry in WalkDir::new(config_path).into_iter() // Iterator used to walk directory
