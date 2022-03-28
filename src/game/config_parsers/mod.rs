@@ -59,8 +59,8 @@ impl GameData {
                 .unwrap_or(false )// include this path in the processed paths if it passed, else don't
             ) {
 
-            println!("{:?}", entry);
-            println!("{:?}", entry.path().file_name());
+            //println!("{:?}", entry);
+            //println!("{:?}", entry.path().file_name());
 
             if entry.path().file_name() == Some(OsStr::new("game.yaml")) {
                 game::process_config(self, entry.path());
@@ -75,7 +75,7 @@ impl GameData {
                 if let Some(parent) = parent_opt {
                     // Then check it against our valid parents
                     match parent {
-                        "maps" => { maps::process_config(self, entry.path()); }
+                        "maps" => { maps::process_config_serde(self, entry.path()); }
                         "characters" => { characters::process_config(self, entry.path()); }
                         "objects" => { objects::process_config(self, entry.path()); }
                         _ => { println!("Found unknown file '{:?}', ignoring", entry.path())}

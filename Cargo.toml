@@ -11,3 +11,5 @@ walkdir = "2"
 yaml-rust = "0.4"
 rust-embed="6.3.0"
 crossterm = "0.23"
+serde = {version = "1.0.136", features = ["derive"]}
+serde_yaml = "0.8"
