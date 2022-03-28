@@ -27,6 +27,27 @@ pub struct GameData {
 }
 
 impl GameData {
+    pub fn process_configs(config_path: std::path::PathBuf) -> GameData {
+        println!("Parsing configs");
+
+        let mut game_data = GameData{
+            maps: Vec::new(),
+            characters: Vec::new(),
+            objects: Vec::new(),
+            info: GameInfo{
+                name: "".to_string(),
+                description: "".to_string(),
+                author: "".to_string(),
+                min_screen_cols: 0,
+                min_screen_rows: 0
+            }
+        };
+
+        game_data.scan_config(config_path);
+
+        return game_data;
+    }
+
     fn scan_config(&mut self, config_path: std::path::PathBuf) {
 
         // Loop over every file in the provided folder
@@ -66,24 +87,3 @@ impl GameData {
 
 }
 
-
-pub fn process_configs(config_path: std::path::PathBuf) -> GameData {
-    println!("Parsing configs");
-
-    let mut game_data = GameData{
-        maps: Vec::new(),
-        characters: Vec::new(),
-        objects: Vec::new(),
-        info: GameInfo{
-            name: "".to_string(),
-            description: "".to_string(),
-            author: "".to_string(),
-            min_screen_cols: 0,
-            min_screen_rows: 0
-        }
-    };
-
-    game_data.scan_config(config_path);
-
-    return game_data;
-}

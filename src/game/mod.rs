@@ -24,7 +24,7 @@ impl Game {
     pub fn initialize(config_path:std::path::PathBuf) -> Game {
         println!("Initializing Game");
 
-        let game_data = config_parsers::process_configs(config_path);
+        let game_data = config_parsers::GameData::process_configs(config_path);
 
         // Create a display object
         let screen = Screen::initialize();
