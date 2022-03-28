@@ -13,11 +13,14 @@ pub fn process_config(game_data: &mut GameData, config_path: &Path) -> Result<()
     // Convert to YAML
     let docs = YamlLoader::load_from_str(&*file_contents).unwrap();
     // Multi document support, doc is a yaml::Yaml, need to extract the doc
-    let doc = &docs[0];
+    let doc:&Yaml = &docs[0];
 
     // Debug print
     println!("Map YAML:\n{:?}", doc);
-
+    println!("Unwrapped Doc?\n");
+    for (k,v) in doc.as_hash().unwrap(){
+        println!("{:?} : {:?}",k,v);
+    }
     // Todo: Parse fields
     let map = Map{ grid: vec![] };
     // ... 

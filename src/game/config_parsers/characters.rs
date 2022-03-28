@@ -17,7 +17,7 @@ pub fn process_config(game_data: &mut GameData, config_path: &Path) -> Result<()
     let doc = &docs[0];
 
     // Debug print
-    println!("{:?}", doc);
+    //println!("{:?}", doc);
 
     // Todo: Parse fields
     let character = Character{

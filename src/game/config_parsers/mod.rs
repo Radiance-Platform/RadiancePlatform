@@ -38,8 +38,8 @@ impl GameData {
                 .unwrap_or(false )// include this path in the processed paths if it passed, else don't
             ) {
 
-            println!("{:?}", entry);
-            println!("{:?}", entry.path().file_name());
+            //println!("{:?}", entry);
+            //println!("{:?}", entry.path().file_name());
 
             if entry.path().file_name() == Some(OsStr::new("game.yaml")) {
                 game::process_config(self, entry.path());
