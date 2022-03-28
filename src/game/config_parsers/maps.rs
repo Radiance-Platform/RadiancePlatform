@@ -2,6 +2,7 @@ use std::error::Error;
 use std::fs;
 use std::path::Path;
 use yaml_rust::{YamlLoader,Yaml};
+use yaml_rust::Yaml::Hash;
 use crate::game::config_parsers::GameData;
 use crate::game::maps::Map;
 
@@ -20,6 +21,9 @@ pub fn process_config(game_data: &mut GameData, config_path: &Path) -> Result<()
     println!("Unwrapped Doc?\n");
     for (k,v) in doc.as_hash().unwrap(){
         println!("{:?} : {:?}",k,v);
+        for(kk,vv) in v.as_hash().unwrap_or_else(|| LinkedHashMap){
+            println!("{:?} : {:?}",kk,vv);
+        }
     }
     // Todo: Parse fields
     let map = Map{ grid: vec![] };

@@ -23,7 +23,7 @@ pub fn process_config(game_data: &mut GameData, config_path: &Path) -> Result<()
     let character = Character{
         name: "".to_string(),
         role: Role { role: "".to_string() },
-        traits: vec![]
+        attributes: vec![]
     };
     // ...
 
