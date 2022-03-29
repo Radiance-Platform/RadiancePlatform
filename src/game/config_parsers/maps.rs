@@ -36,7 +36,7 @@ pub fn process_config_serde(game_data: &mut GameData, map_item_data: &mut Vec<Ma
     let doc = serde_yaml::from_str::<MapItemData>(&file_contents);
     match doc {
         Ok(parsed) => {
-            println!("Success!\n {:?}", parsed);
+            println!("Map Data Parsed\n {:?}", parsed);
             map_item_data.push(parsed);
         }
         Err(err) =>{
