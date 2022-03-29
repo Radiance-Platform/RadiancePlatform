@@ -4,7 +4,7 @@ use std::path::{Component, Path};
 use std::path::Component::Normal;
 use walkdir::WalkDir;
 use crate::game::characters::Character;
-use crate::game::maps::MapData::Character;
+use crate::game::maps::MapData::Character as MapCharacter;
 use crate::game::objects::Object;
 
 mod characters;
@@ -78,8 +78,8 @@ impl GameData {
                     // Then check it against our valid parents
                     match parent {
                         "maps" => { maps::process_config_serde(self, entry.path()); }
-                        "characters" => { characters::process_config(self, entry.path()); }
-                        "objects" => { objects::process_config(self, entry.path()); }
+                        "characters" => { characters::process_config_serde(self, entry.path()); }
+                        "objects" => { objects::process_config_serde(self, entry.path()); }
                         _ => { println!("Found unknown file '{:?}', ignoring", entry.path())}
                     }
                 }

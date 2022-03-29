@@ -4,7 +4,7 @@ use std::path::Path;
 use yaml_rust::YamlLoader;
 use yaml_rust::Yaml;
 use crate::game::config_parsers::GameData;
-use crate::game::objects::Object;
+use crate::game::objects::{Object, ObjectData};
 use crate::game::objects::ObjectState;
 
 pub fn process_config(game_data: &mut GameData, config_path: &Path) -> Result<(), Box<dyn Error>> {
@@ -67,8 +67,22 @@ pub fn process_config(game_data: &mut GameData, config_path: &Path) -> Result<()
     println!("object.state = {:?}", object.state);
     println!();
 
-    game_data.objects.push(object);
+    //game_data.objects.push(object);
 
+    Ok(())
+}
+// Todo: Generalize the struct and manually handle extraneous data
+pub fn process_config_serde(game_data: &mut GameData, config_path: &Path) -> Result<(),serde_yaml::Error>{
+    let file_contents = fs::read_to_string(config_path).unwrap();
+    let doc = serde_yaml::from_str::<ObjectData>(&file_contents);
+    match doc{
+        Ok(parsed) =>{
+            println!("Object Data Parsed\n{:?}",parsed);
+        }
+        Err(err) =>{
+            println!("{}",err);
+        }
+    }
     Ok(())
 }
 
