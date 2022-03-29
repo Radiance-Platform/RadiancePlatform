@@ -31,12 +31,13 @@ pub fn process_config(game_data: &mut GameData, config_path: &Path) -> Result<()
 
     Ok(())
 }
-pub fn process_config_serde(game_data: &mut GameData, config_path: &Path) -> Result<(),serde_yaml::Error>{
+pub fn process_config_serde(game_data: &mut GameData, map_item_data: &mut Vec<MapItemData>, config_path: &Path) -> Result<(),serde_yaml::Error>{
     let file_contents = fs::read_to_string(config_path).unwrap();
     let doc = serde_yaml::from_str::<MapItemData>(&file_contents);
     match doc {
         Ok(parsed) => {
             println!("Success!\n {:?}", parsed);
+            map_item_data.push(parsed);
         }
         Err(err) =>{
             println!("{}",err);

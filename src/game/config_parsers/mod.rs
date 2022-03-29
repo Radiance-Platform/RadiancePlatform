@@ -4,8 +4,9 @@ use std::path::{Component, Path};
 use std::path::Component::Normal;
 use walkdir::WalkDir;
 use crate::game::characters::Character;
-use crate::game::maps::MapData::Character;
 use crate::game::objects::Object;
+
+use super::maps::MapItemData;
 
 mod characters;
 mod game;
@@ -48,7 +49,9 @@ impl GameData {
     fn scan_config(&mut self, config_path: std::path::PathBuf) {
 
         // As the configs are read, everything is thrown in these vectors, then after all are read, they get put into the actual map objects
-        //let characters = Vec<Character>();
+        let mut characters = Vec::<Character>::new();
+        let mut objects = Vec::<Object>::new();
+        let mut map_item_data = Vec::<MapItemData>::new();
 
         // TODO: Ensure that the maps are read last so that objects/characters can then be stored in the map
 
@@ -77,14 +80,19 @@ impl GameData {
                 if let Some(parent) = parent_opt {
                     // Then check it against our valid parents
                     match parent {
-                        "maps" => { maps::process_config_serde(self, entry.path()); }
-                        "characters" => { characters::process_config(self, entry.path()); }
-                        "objects" => { objects::process_config(self, entry.path()); }
+                        "maps" => { maps::process_config_serde(self, &mut map_item_data, entry.path()); }
+                        "characters" => { characters::process_config(self, &mut characters, entry.path()); }
+                        "objects" => { objects::process_config(self, &mut objects, entry.path()); }
                         _ => { println!("Found unknown file '{:?}', ignoring", entry.path())}
                     }
                 }
             }
         }
+        self.set_map_grid(map_item_data, characters, objects);
+    }
+
+    fn set_map_grid(&mut self, map_item_data: Vec<MapItemData>, characters: Vec<Character>, objects: Vec<Object> ) {
+
     }
 
 }

@@ -6,7 +6,7 @@ use crate::game::characters::Character;
 use crate::game::characters::role::Role;
 use crate::game::config_parsers::GameData;
 
-pub fn process_config(game_data: &mut GameData, config_path: &Path) -> Result<(), Box<dyn Error>> {
+pub fn process_config(game_data: &mut GameData, characters: &mut Vec<Character>, config_path: &Path) -> Result<(), Box<dyn Error>> {
 
     // Load file contents
     let file_contents = fs::read_to_string(config_path)?;
@@ -27,7 +27,7 @@ pub fn process_config(game_data: &mut GameData, config_path: &Path) -> Result<()
     };
     // ...
 
-    game_data.characters.push(character);
+    characters.push(character);
 
     Ok(())
 }

@@ -1,6 +1,6 @@
 use serde::{Serialize,Deserialize};
 use crate::game::characters::Character;
-//use crate::game::objects::Object;
+use crate::game::objects::Object;
 
 pub enum MapData {
     Character(Character),
@@ -17,7 +17,7 @@ pub struct MapItemData {
     pub id: String,
     pub description: String,
     pub size: Size,
-    pub objects: Vec<Object>,
+    pub objects: Vec<MapObject>,
 }
 
 #[derive(Debug,Serialize, Deserialize)]
@@ -29,7 +29,7 @@ pub struct Size {
 
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct Object {
+pub struct MapObject {
     pub id: String,
     pub position: Position,
 }

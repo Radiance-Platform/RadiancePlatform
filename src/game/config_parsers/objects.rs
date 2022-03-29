@@ -7,7 +7,7 @@ use crate::game::config_parsers::GameData;
 use crate::game::objects::Object;
 use crate::game::objects::ObjectState;
 
-pub fn process_config(game_data: &mut GameData, config_path: &Path) -> Result<(), Box<dyn Error>> {
+pub fn process_config(game_data: &mut GameData, objects: &mut Vec<Object>, config_path: &Path) -> Result<(), Box<dyn Error>> {
 
     // Load file contents
     let file_contents = fs::read_to_string(config_path)?;
@@ -67,7 +67,7 @@ pub fn process_config(game_data: &mut GameData, config_path: &Path) -> Result<()
     println!("object.state = {:?}", object.state);
     println!();
 
-    game_data.objects.push(object);
+    //game_data.objects.push(object);
 
     Ok(())
 }
