@@ -2,7 +2,7 @@ use std::error::Error;
 use std::fs;
 use std::path::Path;
 use yaml_rust::YamlLoader;
-use crate::game::characters::Character;
+use crate::game::characters::{Character, CharacterData};
 use crate::game::characters::role::Role;
 use crate::game::config_parsers::GameData;
 
@@ -27,7 +27,21 @@ pub fn process_config(game_data: &mut GameData, config_path: &Path) -> Result<()
     };
     // ...
 
-    game_data.characters.push(character);
+    //game_data.characters.push(character);
 
+    Ok(())
+}
+
+pub fn process_config_serde(game_data: & mut GameData, config_path: &Path) -> Result<(), serde_yaml::Error>{
+    let file_contents = fs::read_to_string(config_path).unwrap();
+    let doc = serde_yaml::from_str::<CharacterData>(&file_contents);
+    match doc {
+        Ok(parsed) =>{
+            println!("Character Data Parsed\n{:?}",parsed);
+        }
+        Err(err) =>{
+            println!("{}",err);
+        }
+    }
     Ok(())
 }

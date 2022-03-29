@@ -67,7 +67,7 @@ pub fn process_config(game_data: &mut GameData, config_path: &Path) -> Result<()
     println!("object.state = {:?}", object.state);
     println!();
 
-    game_data.objects.push(object);
+    //game_data.objects.push(object);
 
     Ok(())
 }
