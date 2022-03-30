@@ -1,5 +1,6 @@
 
 
+#[derive(Clone)]
 pub struct Attribute {
     pub name: String,
     pub min_val: u8,

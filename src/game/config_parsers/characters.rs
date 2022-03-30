@@ -1,4 +1,5 @@
 use std::error::Error;
+use std::collections::HashMap;
 use std::fs;
 use std::path::Path;
 use yaml_rust::YamlLoader;
@@ -32,7 +33,8 @@ pub fn process_config(game_data: &mut GameData, characters: &mut Vec<Character>,
     Ok(())
 }
 
-pub fn process_config_serde(game_data: & mut GameData, characters: &mut Vec<Character>, config_path: &Path) -> Result<(), serde_yaml::Error>{
+pub fn process_config_serde(game_data: & mut GameData, 
+                            characters: &mut HashMap<String, Character>, config_path: &Path) -> Result<(), serde_yaml::Error>{
     let file_contents = fs::read_to_string(config_path).unwrap();
     let doc = serde_yaml::from_str::<CharacterData>(&file_contents);
     match doc {
@@ -43,6 +45,6 @@ pub fn process_config_serde(game_data: & mut GameData, characters: &mut Vec<Char
             println!("{}",err);
         }
     }
-    //characters.push(character);
+    //characters.push(character.id, character);
     Ok(())
 }

@@ -1,6 +1,7 @@
 use std::error::Error;
 use std::fs;
 use std::path::Path;
+use std::collections::HashMap;
 use yaml_rust::YamlLoader;
 use yaml_rust::Yaml;
 use crate::game::config_parsers::GameData;
@@ -72,7 +73,8 @@ pub fn process_config(game_data: &mut GameData, objects: &mut Vec<Object>, confi
     Ok(())
 }
 // Todo: Generalize the struct and manually handle extraneous data
-pub fn process_config_serde(game_data: &mut GameData, objects: &mut Vec<Object>, config_path: &Path) -> Result<(),serde_yaml::Error>{
+pub fn process_config_serde(game_data: &mut GameData,
+                            objects: &mut HashMap<String, Object>, config_path: &Path) -> Result<(),serde_yaml::Error>{
     let file_contents = fs::read_to_string(config_path).unwrap();
     let doc = serde_yaml::from_str::<ObjectData>(&file_contents);
     match doc{
@@ -83,7 +85,7 @@ pub fn process_config_serde(game_data: &mut GameData, objects: &mut Vec<Object>,
             println!("{}",err);
         }
     }
-    //objects.push(object);
+    //objects.push(object.id, object);
     Ok(())
 }
 

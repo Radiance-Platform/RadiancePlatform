@@ -5,6 +5,8 @@ use std::path::Component::Normal;
 use walkdir::WalkDir;
 use crate::game::characters::Character;
 use crate::game::objects::Object;
+use crate::game::maps::MapData;
+use std::collections::HashMap;
 
 use super::maps::MapItemData;
 
@@ -49,8 +51,8 @@ impl GameData {
     fn scan_config(&mut self, config_path: std::path::PathBuf) {
 
         // As the configs are read, everything is thrown in these vectors, then after all are read, they get put into the actual map objects
-        let mut characters = Vec::<Character>::new();
-        let mut objects = Vec::<Object>::new();
+        let mut characters = HashMap::<String, Character>::new();
+        let mut objects = HashMap::<String, Object>::new();
         let mut map_item_data = Vec::<MapItemData>::new();
 
         // TODO: Ensure that the maps are read last so that objects/characters can then be stored in the map
@@ -91,8 +93,27 @@ impl GameData {
         self.set_map_grid(map_item_data, characters, objects);
     }
 
-    fn set_map_grid(&mut self, map_item_data: Vec<MapItemData>, characters: Vec<Character>, objects: Vec<Object> ) {
-
+    fn set_map_grid(&mut self, map_item_data: Vec<MapItemData>, characters: HashMap<String, Character>,
+                                                                objects: HashMap< String, Object> ) {
+        for map_item in map_item_data {
+            let mut map = Map{
+                grid: vec![]
+            };
+            for map_object in map_item.objects {
+                let object_id = map_object.id;
+                let pos_x = map_object.position.x;
+                let pos_y = map_object.position.y;
+                let character = characters.get(&object_id);
+                let object = objects.get(&object_id);
+                if character.is_some() {
+                    map.grid[pos_x][pos_y] = Option::<MapData>::Some(MapData::Character(character.unwrap().to_owned()));
+                }
+                if object.is_some() {
+                    map.grid[pos_x][pos_y] = Option::<MapData>::Some(MapData::Object(object.unwrap().to_owned()));
+                }
+            }
+            self.maps.push(map);
+        }
     }
 
 }

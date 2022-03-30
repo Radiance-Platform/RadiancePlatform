@@ -6,7 +6,7 @@ pub mod role;
 pub mod attribute;
 
 
-
+#[derive(Clone)]
 pub struct Character {
     pub name: String,
     pub role: Role,
