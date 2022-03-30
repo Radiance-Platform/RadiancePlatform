@@ -2,6 +2,7 @@ use serde::{Serialize,Deserialize};
 use crate::game::characters::Character;
 use crate::game::objects::Object;
 
+#[derive(Clone)]
 pub enum MapData {
     Character(Character),
     Object(Object)

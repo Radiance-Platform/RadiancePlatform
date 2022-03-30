@@ -99,6 +99,11 @@ impl GameData {
             let mut map = Map{
                 grid: vec![]
             };
+            map.grid.resize(map_item.size.width as usize, vec![] );
+            for i in 0..(map_item.size.width) {
+                map.grid[i as usize].resize(map_item.size.height as usize, Option::<MapData>::None);
+            }
+
             for map_object in map_item.objects {
                 let object_id = map_object.id;
                 let pos_x = map_object.position.x;

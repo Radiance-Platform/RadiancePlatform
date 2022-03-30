@@ -5,6 +5,10 @@ size:
   width: 20
   height: 10
 objects:
+  - id: "angry_antagonist"
+    position:
+      x: 15
+      y: 9
   - id: "door_1"
     position:
       x: 5

@@ -36,8 +36,8 @@ pub struct InventorySize {
 pub struct Trait {
     pub name: String,
     pub display_name: String,
-    pub starting_value: i64,
-    pub max_value: i64,
+    pub starting_value: u8,
+    pub max_value: u8,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
