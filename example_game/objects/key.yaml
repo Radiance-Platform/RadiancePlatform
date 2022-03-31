@@ -4,9 +4,3 @@ type: "usable"
 icon: "K"
 state:
 interactions:
-  world:
-    - type: "unlock_door"
-      affects:
-        - id: "door_1"
-      self_action:
-        consume_item: true

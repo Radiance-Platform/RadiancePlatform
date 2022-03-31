@@ -8,18 +8,13 @@ state:
     default: false
 interactions:
   activate:
-    - type: "travel"
+    - category: "travel"
       prereqs:
-        state:
-          - id: "unlocked"
-            value: true
+        - unlocked: true
       destination: "basement"
-  world:
-    - type: "unlock_door"
-      affected_by:
-        - id: "key"
+  object_use:
+    - foreign_objects_id: "key"
       self_action:
-        set_state:
-          - unlocked: true
+        - unlocked: true
       other_action:
         consume_item: true

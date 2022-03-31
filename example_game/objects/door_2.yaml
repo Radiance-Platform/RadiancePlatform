@@ -8,9 +8,7 @@ state:
     default: true
 interactions:
   activate:
-    - type: "travel"
+    - category: "travel"
       prereqs:
-        state:
-          - id: "unlocked"
-            value: true
+        - unlocked: true
       destination: "room_2"

@@ -6,27 +6,34 @@ pub struct ObjectState {
     pub value: bool
 }
 
+/*
 #[derive(Clone)]
 pub struct ObjectInteraction {
     pub category: ObjectInteractionCategory,
     pub values: String
 }
+*/
 
-#[derive(Clone)]
-pub enum ObjectInteractionCategory {
+#[derive(Clone, Debug)]
+pub enum ObjectInteraction {
     ObjectInteractionActivate(ObjectInteractionActivate),
-    ObjectInteractionWorld(ObjectInteractionWorld)
+    ObjectInteractionObjectUse(ObjectInteractionObjectUse)
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct ObjectInteractionActivate {
-
+    pub category: String,
+    pub prereqs: Vec<ObjectState>,
+    pub destination: Option<String>
 }
 
-#[derive(Clone)]
-pub struct ObjectInteractionWorld {
-
+#[derive(Clone, Debug)]
+pub struct ObjectInteractionObjectUse{
+    pub foreign_object_id: String,
+    pub self_action: Vec<ObjectState>,
+    pub consume_item: bool
 }
+
 
 #[derive(Clone)]
 pub struct Object {
