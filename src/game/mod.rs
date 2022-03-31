@@ -100,15 +100,15 @@ pub struct GameState {
     pub do_exit: bool,
     pub visual_state: VisualStates,
     pub cursor_blink: bool,
-    pub current_map_id: u8,
+    pub current_map_id: usize,
 }
 
 impl GameState {
-    pub fn map_from_id(game_data: &GameData, map_id: &String) -> u8 {
+    pub fn map_from_id(game_data: &GameData, map_id: &String) -> usize {
         // Find the map that has an ID matching the provided map_id string
         for i in 0..game_data.maps.len() {
             if game_data.maps[i].info.id == map_id.to_string() {
-                return i as u8;
+                return i;
             }
         }
         panic!("Failed to locate map by ID");

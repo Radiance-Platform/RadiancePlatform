@@ -1,3 +1,4 @@
+use std::fmt::Debug;
 use crate::game::config_parsers::GameData;
 use crate::game::GameState;
 
@@ -259,19 +260,38 @@ impl Screen {
     // TODO: Implementation, documentation
     fn draw_playing_map(&self, game_data: &GameData, game_state: &mut GameState) -> Result<()> {
 
+        // Clear the screen
+        self.draw_border(0, 0, 80, 20)?;
+
+        // Find the current map that the player is in
+        let map = &game_data.maps[game_state.current_map_id];
+
+        // Create a wrapped version of the map's description
+
+        let text = textwrap::wrap(&map.info.description,80-4);
+
+        // Draw box at the top
+        self.draw_border(0, 0, 80, 6)?;
+
         // Debug
         execute!(
             stdout(),
             MoveTo(2, 1),
-            Print("Map View")
+            Print("Map View"),
+            MoveTo(2, 2),
+            Print(&game_data.maps[game_state.current_map_id].info.id),
+            MoveTo(2, 3),
         )?;
 
-        // Find the current map that the player is in
+        for i in 0..text.len() {
+            execute!(
+                stdout(),
+                MoveTo(2, 3+i as u16),
+                Print(&text[i]),
+            )?;
+        }
 
-        // Draw box at the top
-        /*if(game_data.maps[game_state.current_map]) {
 
-        }*/
 
         if !game_state.last_character_processed {
 
