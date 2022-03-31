@@ -5,3 +5,4 @@ author: "The Radiance Team"
 min_screen_size:
   width: 80
   height: 20
+starting_map: "Main Room"

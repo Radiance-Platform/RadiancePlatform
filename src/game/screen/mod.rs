@@ -258,11 +258,20 @@ impl Screen {
 
     // TODO: Implementation, documentation
     fn draw_playing_map(&self, game_data: &GameData, game_state: &mut GameState) -> Result<()> {
+
+        // Debug
         execute!(
             stdout(),
             MoveTo(2, 1),
             Print("Map View")
         )?;
+
+        // Find the current map that the player is in
+
+        // Draw box at the top
+        /*if(game_data.maps[game_state.current_map]) {
+
+        }*/
 
         if !game_state.last_character_processed {
 
