@@ -51,16 +51,6 @@ pub fn process_config(game_data: &mut GameData, config_path: &Path) -> Result<()
             _ => {continue;}
         }
     }
-    /* Debug */
-    println!();
-    println!("Debug config_parsers/game.rs:");
-    println!("game_data.info.name = {:?}", game_data.info.name);
-    println!("game_data.info.description = {:?}", game_data.info.description);
-    println!("game_data.info.author = {:?}", game_data.info.author);
-    println!("game_data.info.min_screen_cols = {:?}", game_data.info.min_screen_cols);
-    println!("game_data.info.min_screen_rows = {:?}", game_data.info.min_screen_rows);
-    println!("game_data.info.starting_map = {:?}", game_data.info.starting_map);
-    println!();
 
     Ok(())
 }

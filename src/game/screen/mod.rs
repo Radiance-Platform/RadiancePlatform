@@ -2,24 +2,23 @@ use std::fmt::Debug;
 use crate::game::config_parsers::GameData;
 use crate::game::GameState;
 
-use std::io::{Error, ErrorKind, stdout, Write};
-use std::process::exit;
+use std::io::{Error, ErrorKind, stdout};
+use std::process::{exit};
 
 use crossterm::{
     execute,
-    style::{Color, Print, ResetColor, SetBackgroundColor, SetForegroundColor},
+    style::{Print},
     ExecutableCommand, Result,
-    event,
     terminal::{ScrollUp, SetSize, size},
     cursor::{MoveTo}
 };
-use crossterm::cursor::{DisableBlinking, EnableBlinking, Hide, SetCursorShape, Show};
-use crossterm::event::{Event, KeyCode, KeyEvent, KeyModifiers};
+use crossterm::cursor::{Hide, Show};
+use crossterm::event::{Event, KeyCode, KeyModifiers};
 use crossterm::terminal::{disable_raw_mode, enable_raw_mode, Clear, ClearType};
-use crate::game::maps::MapData;
 use crate::game::maps::MapData::{Character, Object};
 
-pub enum VisualStates {
+#[derive(Clone, Debug)]
+pub enum VisualState {
     StartScreen,
     PlayingMap,
     PlayingDialog,
@@ -28,6 +27,7 @@ pub enum VisualStates {
     PlayingCharacterFight,
 }
 
+#[derive(Clone, Debug)]
 pub struct Screen {
     original_columns: u16,
     original_rows: u16,
@@ -130,6 +130,16 @@ impl Screen {
         Ok(())
     }
 
+    // Function for handling the exit dialog and action
+    fn handle_exit_key(&self, game_state: &mut GameState) {
+        game_state.dialog_message = "Would you like to exit the game?".to_string();
+        game_state.dialog_option_0 = "No".to_string();
+        game_state.dialog_option_1 = "Yes".to_string();
+        game_state.dialog_return_to = game_state.visual_state.clone();
+        game_state.visual_state = VisualState::PlayingDialog;
+        game_state.pre_exit = true;
+    }
+
     fn draw_border(&self, start_col: u16, start_row: u16, cols: u16, rows: u16) -> Result<()> {
         // Loop over each row
         for r in start_row..start_row+rows {
@@ -210,48 +220,37 @@ impl Screen {
             // TODO: Add processing for other key presses here
             // For example, control+C via something like
             // game_state.last_character_pressed.as_ref().unwrap().modifiers == KeyModifiers::CONTROL && keycode == KeyCode::Char('C')
-            if keycode == KeyCode::Char('C') {
+            if keycode == KeyCode::Esc {
+                self.handle_exit_key(game_state);
+
+            } else if keycode == KeyCode::Char('M') {
+                // Change to map view
+                game_state.visual_state = VisualState::PlayingMap;
                 execute!(
                     stdout(),
                     MoveTo(10, 11),
-                    Print("Would you like to exit? Y/N")
+                    Print("Changing to map view")
                 )?;
-                game_state.pre_exit = true;
-
-            } else if game_state.pre_exit {
-                if keycode == KeyCode::Char('Y') {
-                    game_state.do_exit = true;
-                } else {
-                    execute!(
-                        stdout(),
-                        MoveTo(10, 11),
-                        Print("Exit aborted")
-                    )?;
-                    game_state.pre_exit = false;
-                }
-            } else if keycode == KeyCode::Char('M') {
-
-                // Change to map view
-                game_state.visual_state = VisualStates::PlayingMap;
-                execute!(
-                        stdout(),
-                        MoveTo(10, 11),
-                        Print("Changing to map view")
-                    )?;
 
             } else if keycode == KeyCode::Char('D') {
-
                 // Change to dialog view
-                game_state.visual_state = VisualStates::PlayingDialog;
+                game_state.visual_state = VisualState::PlayingDialog;
                 execute!(
-                        stdout(),
-                        MoveTo(10, 11),
-                        Print("Changing to dialog view")
-                    )?;
+                    stdout(),
+                    MoveTo(10, 11),
+                    Print("Changing to dialog view")
+                )?;
 
             }
 
             game_state.last_character_processed = true;
+            match self.draw(game_data, game_state) {
+                Ok(_) => {},
+                Err(_) => {
+                    println!("ERROR: Problem encountered while drawing screen, exiting!");
+                    self.end();
+                }
+            }
         }
 
         self.blink_cursor(game_state)?;
@@ -327,32 +326,13 @@ impl Screen {
                 _ => { KeyCode::Null }
             };
 
-
-            execute!(
-                stdout(),
-                MoveTo(10, 10),
-                Print("Received keycode: "),
-                Print(format!("{:?} ", keycode)),
-                //Print(format!("{:?}", keycode2)),
-            )?;
-
             // Process exiting the game
             // TODO: Add processing for other key presses here
             // For example, control+C via something like
             // game_state.last_character_pressed.as_ref().unwrap().modifiers == KeyModifiers::CONTROL && keycode == KeyCode::Char('C')
-            if keycode == KeyCode::Char('C') {
-                game_state.dialog_message = "Would you like to exit the game?".to_string();
-                game_state.dialog_option_0 = "No".to_string();
-                game_state.dialog_option_1 = "Yes".to_string();
-                game_state.visual_state = VisualStates::PlayingDialog;
-                game_state.pre_exit = true;
+            if keycode == KeyCode::Esc {
+                self.handle_exit_key(game_state);
 
-            } else if game_state.pre_exit {
-                if keycode == KeyCode::Char('Y') {
-                    game_state.do_exit = true;
-                } else {
-                    game_state.pre_exit = false;
-                }
             } else if keycode == KeyCode::Char('M') {
 
                 // Change to the next map
@@ -365,7 +345,7 @@ impl Screen {
             } else if keycode == KeyCode::Char('H') {
 
                 // Change to home view
-                game_state.visual_state = VisualStates::StartScreen;
+                game_state.visual_state = VisualState::StartScreen;
                 execute!(
                         stdout(),
                         MoveTo(10, 11),
@@ -416,7 +396,7 @@ impl Screen {
             )?;
         }
 
-        // Display selected button
+        // Display selected button highlighting
         if game_state.dialog_selected == 0 {
             for i in 0..width/2-2 {
                 execute!(
@@ -434,8 +414,6 @@ impl Screen {
                 )?;
             }
         }
-
-
 
         // Display button text
         // TODO: Proper centering of the text
@@ -471,25 +449,23 @@ impl Screen {
                 }
 
             } else if keycode == KeyCode::Enter {
+                // Check if we need to do a full exit or a return to the previous screen
                 if game_state.pre_exit {
                     if game_state.dialog_selected == 1 {
                         game_state.do_exit = true;
                     } else {
-                        execute!(
-                            stdout(),
-                            MoveTo(10, 11),
-                            Print("Exit aborted")
-                        )?;
                         game_state.pre_exit = false;
+                        game_state.visual_state = game_state.dialog_return_to.clone();
                     }
                 } else {
-                    // TODO basically
+                    // Set up the result and return to the previous screen
+                    game_state.dialog_result_ready = true;
                 }
 
             } else if keycode == KeyCode::Char('H') {
 
                 // Change to map view
-                game_state.visual_state = VisualStates::StartScreen;
+                game_state.visual_state = VisualState::StartScreen;
                 execute!(
                     stdout(),
                     MoveTo(10, 11),
@@ -499,7 +475,7 @@ impl Screen {
             } else if keycode == KeyCode::Char('M') {
 
                 // Change to map view
-                game_state.visual_state = VisualStates::PlayingMap;
+                game_state.visual_state = VisualState::PlayingMap;
                 execute!(
                         stdout(),
                         MoveTo(10, 11),
@@ -545,22 +521,22 @@ impl Screen {
         //self.draw_border(0, 0, 80, 20)?;
 
         match game_state.visual_state {
-            VisualStates::StartScreen => {
+            VisualState::StartScreen => {
                 self.draw_start_screen(game_data, game_state)?;
             },
-            VisualStates::PlayingMap => {
+            VisualState::PlayingMap => {
                 self.draw_playing_map(game_data, game_state)?;
             },
-            VisualStates::PlayingDialog => {
+            VisualState::PlayingDialog => {
                 self.draw_playing_dialog(game_data, game_state)?;
             },
-            VisualStates::PlayingInventory => {
+            VisualState::PlayingInventory => {
                 self.draw_playing_dialog(game_data, game_state)?;
             },
-            VisualStates::PlayingCharacterInteraction => {
+            VisualState::PlayingCharacterInteraction => {
                 self.draw_playing_character_interaction(game_data, game_state)?;
             },
-            VisualStates::PlayingCharacterFight => {
+            VisualState::PlayingCharacterFight => {
                 self.draw_playing_character_fight(game_data, game_state)?;
             },
         }
@@ -591,6 +567,9 @@ impl Screen {
 
         // Clear the screen
         execute!(stdout(), Clear(ClearType::All))?;
+
+        // Move the cursor back down so the user can see the prompt
+        execute!(stdout(), MoveTo(0, 0))?;
 
         Ok(())
     }

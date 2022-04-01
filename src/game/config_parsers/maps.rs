@@ -23,7 +23,6 @@ pub fn process_config_serde(map_item_data: &mut Vec<MapItemData>, config_path: &
     let doc = serde_yaml::from_str::<MapItemData>(&file_contents);
     match doc {
         Ok(parsed) => {
-            println!("Map Data Parsed\n {:?}", parsed);
             map_item_data.push(parsed);
         }
         Err(err) =>{

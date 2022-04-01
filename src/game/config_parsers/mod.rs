@@ -89,7 +89,7 @@ impl GameData {
                         "maps" => { maps::process_config_serde(&mut map_item_data, entry.path()); }
                         "characters" => { characters::process_config_serde(self, &mut characters, entry.path()); }
                         "objects" => { objects::process_config(self, &mut objects, entry.path()); }
-                        _ => { println!("Found unknown file '{:?}', ignoring", entry.path())}
+                        _ => { println!("Found unknown file '{:?}', ignoring", entry.path()) }
                     }
                 }
             }

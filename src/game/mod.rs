@@ -1,7 +1,7 @@
 use std::process::exit;
 use std::time::Duration;
 use config_parsers::GameData;
-use crate::game::screen::{Screen, VisualStates};
+use crate::game::screen::{Screen, VisualState};
 
 use crossterm::{event::{read, DisableMouseCapture, EnableMouseCapture, Event, KeyCode}, execute, terminal::{disable_raw_mode, enable_raw_mode}, Result, event};
 use crate::game::maps::Map;
@@ -27,8 +27,6 @@ impl Game {
 
         let game_data = config_parsers::GameData::process_configs(config_path);
 
-        println!("{:?}", game_data);
-
         // Create a display object
         let screen = Screen::initialize();
 
@@ -37,13 +35,15 @@ impl Game {
             last_character_processed: true,
             pre_exit: false,
             do_exit: false,
-            visual_state: VisualStates::StartScreen,
+            visual_state: VisualState::StartScreen,
             cursor_blink: false,
             current_map_id: GameState::map_from_id(&game_data, &game_data.info.starting_map),
             dialog_message: "".to_string(),
             dialog_option_0: "".to_string(),
             dialog_option_1: "".to_string(),
             dialog_selected: 0,
+            dialog_result_ready: false,
+            dialog_return_to: VisualState::StartScreen,
         };
 
         return Game{game_data, game_state, screen};
@@ -104,13 +104,15 @@ pub struct GameState {
     pub last_character_processed: bool,
     pub pre_exit: bool,
     pub do_exit: bool,
-    pub visual_state: VisualStates,
+    pub visual_state: VisualState,
     pub cursor_blink: bool,
     pub current_map_id: usize,
     pub dialog_message: String,
     pub dialog_option_0: String,
     pub dialog_option_1: String,
     pub dialog_selected: u8,
+    pub dialog_result_ready: bool,
+    pub dialog_return_to: VisualState
 }
 
 impl GameState {

@@ -15,11 +15,10 @@ pub fn process_config_serde(game_data: & mut GameData,
     let doc = serde_yaml::from_str::<CharacterData>(&file_contents);
     match doc {
         Ok(parsed) =>{
-            println!("Character Data Parsed\n{:?}",parsed);
             get_character_from_data( characters, parsed);
         }
         Err(err) =>{
-            println!("{}",err);
+            println!("{}", err);
         }
     }
     Ok(())

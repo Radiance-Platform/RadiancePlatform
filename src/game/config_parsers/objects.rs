@@ -63,17 +63,6 @@ pub fn process_config(game_data: &mut GameData,
         }
     }
 
-    /* Debug */
-    println!();
-    println!("Debug config_parsers/objects.rs:");
-    println!("object.id = {:?}", object.id);
-    println!("object.name = {:?}", object.name);
-    println!("object.category = {:?}", object.category);
-    println!("object.icon = {:?}", object.icon);
-    println!("object.state = {:?}", object.state);
-    println!("object.interactions = {:?}", object.interactions);
-    println!();
-
     objects.insert(object.id.clone(), object);
 
     Ok(())
