@@ -1,34 +1,34 @@
 use serde::{Serialize,Deserialize};
 
-#[derive(Debug, Clone)]
+#[derive(Clone, Debug)]
 pub struct ObjectState {
     pub name: String,
     pub value: bool
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct ObjectInteraction {
     pub category: ObjectInteractionCategory,
     pub values: String
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub enum ObjectInteractionCategory {
     ObjectInteractionActivate(ObjectInteractionActivate),
     ObjectInteractionWorld(ObjectInteractionWorld)
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct ObjectInteractionActivate {
 
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct ObjectInteractionWorld {
 
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Object {
     pub id: String,
     pub name: String,

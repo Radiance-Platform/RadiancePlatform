@@ -6,3 +6,6 @@ min_screen_size:
   width: 80
   height: 20
 starting_map: "Main Room"
+starting_position:
+  x: 1
+  y: 1

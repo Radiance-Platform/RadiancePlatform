@@ -27,6 +27,8 @@ impl Game {
 
         let game_data = config_parsers::GameData::process_configs(config_path);
 
+        println!("{:?}", game_data);
+
         // Create a display object
         let screen = Screen::initialize();
 

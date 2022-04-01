@@ -1,6 +1,7 @@
 ---
 id: "angry_antagonist"
 name: "Angry Antagonist"
+icon: "A"
 inventory_size:
   width: 3
   height: 3

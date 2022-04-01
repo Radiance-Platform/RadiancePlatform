@@ -15,6 +15,7 @@ mod game;
 mod maps;
 mod objects;
 
+#[derive(Debug)]
 pub struct GameInfo {
     pub name: String,
     pub description: String,
@@ -24,6 +25,7 @@ pub struct GameInfo {
     pub starting_map: String,
 }
 
+#[derive(Debug)]
 pub struct GameData {
     pub maps: Vec<Map>,
     pub info: GameInfo,
