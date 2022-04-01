@@ -270,34 +270,27 @@ impl Screen {
 
         // Create a wrapped version of the map's description
 
-        let text = textwrap::wrap(&map.info.description,80-4);
+        let description = textwrap::wrap(&map.info.description, 80-4);
 
         // Draw box at the top
-        self.draw_border(0, 0, 80, 6)?;
-
-        // Debug
-        execute!(
-            stdout(),
-            MoveTo(2, 1),
-            Print("Map View"),
-            MoveTo(2, 2),
-            Print(&game_data.maps[game_state.current_map_id].info.id),
-            MoveTo(2, 3),
-        )?;
+        self.draw_border(0, 0, 80, 2+description.len() as u16)?;
 
         // Draw the map room description
-        for i in 0..text.len() {
+        for i in 0..description.len() {
             execute!(
                 stdout(),
-                MoveTo(2, 3+i as u16),
-                Print(&text[i]),
+                MoveTo(2, 1+i as u16),
+                Print(&description[i]),
             )?;
         }
 
         // Draw the map room itself
 
+        let start_c = 8;
+        let start_r = 6;
+
         // Border first
-        self.draw_border(2, 7, map.grid.len() as u16, map.grid[0].len() as u16)?;
+        self.draw_border(start_c, start_r, map.grid.len() as u16, map.grid[0].len() as u16)?;
 
         // Then items
         // Go first by each column
@@ -309,14 +302,14 @@ impl Screen {
                         Character(character) => {
                             execute!(
                                 stdout(),
-                                MoveTo(c as u16, r as u16),
+                                MoveTo(start_c+c as u16, start_r+r as u16),
                                 Print(character.icon),
                             )?;
                         }
                         Object(object) => {
                             execute!(
                                 stdout(),
-                                MoveTo(c as u16, r as u16),
+                                MoveTo(start_c+c as u16, start_r+r as u16),
                                 Print(object.icon),
                             )?;
                         }

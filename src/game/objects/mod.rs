@@ -6,16 +6,16 @@ pub struct ObjectState {
     pub value: bool
 }
 
-/*
-#[derive(Clone)]
+
+/*#[derive(Clone, Debug)]
 pub struct ObjectInteraction {
     pub category: ObjectInteractionCategory,
     pub values: String
-}
-*/
+}*/
+
 
 #[derive(Clone, Debug)]
-pub enum ObjectInteractionCategory {
+pub enum ObjectInteraction {
     ObjectInteractionActivate(ObjectInteractionActivate),
     ObjectInteractionObjectUse(ObjectInteractionObjectUse)
 }
