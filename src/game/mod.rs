@@ -40,6 +40,10 @@ impl Game {
             visual_state: VisualStates::StartScreen,
             cursor_blink: false,
             current_map_id: GameState::map_from_id(&game_data, &game_data.info.starting_map),
+            dialog_message: "".to_string(),
+            dialog_option_0: "".to_string(),
+            dialog_option_1: "".to_string(),
+            dialog_selected: 0,
         };
 
         return Game{game_data, game_state, screen};
@@ -103,6 +107,10 @@ pub struct GameState {
     pub visual_state: VisualStates,
     pub cursor_blink: bool,
     pub current_map_id: usize,
+    pub dialog_message: String,
+    pub dialog_option_0: String,
+    pub dialog_option_1: String,
+    pub dialog_selected: u8,
 }
 
 impl GameState {
