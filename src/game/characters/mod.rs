@@ -6,11 +6,12 @@ pub mod role;
 pub mod attribute;
 
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Character {
     pub name: String,
     pub role: Role,
     pub attributes: Vec<Attribute>,
+    pub icon: char,
 }
 
 impl Character {
@@ -21,6 +22,7 @@ impl Character {
 pub struct CharacterData {
     pub id: String,
     pub name: String,
+    pub icon: char,
     pub inventory_size: InventorySize,
     pub traits: Vec<Trait>,
     pub interactions: Interactions,

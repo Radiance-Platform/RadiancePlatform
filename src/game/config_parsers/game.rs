@@ -30,19 +30,23 @@ pub fn process_config(game_data: &mut GameData, config_path: &Path) -> Result<()
                 game_data.info.description = val.as_str().unwrap().to_string();
             }
             "author" => {
-                game_data.info.author = val.as_str().unwrap().to_string();}
+                game_data.info.author = val.as_str().unwrap().to_string();
+            }
             "min_screen_size" => {
                 let width_key = yaml_rust::Yaml::from_str("width");
                 let width = val.as_hash().unwrap()
-                                    .get(&width_key).unwrap_or(&key)
-                                    .as_i64().unwrap();
+                    .get(&width_key).unwrap_or(&key)
+                    .as_i64().unwrap();
                 let height_key = yaml_rust::Yaml::from_str("height");
                 let height = val.as_hash().unwrap()
-                                    .get(&height_key).unwrap_or(&key)
-                                    .as_i64().unwrap();
+                    .get(&height_key).unwrap_or(&key)
+                    .as_i64().unwrap();
 
                 game_data.info.min_screen_cols = width as u16;
                 game_data.info.min_screen_rows = height as u16;
+            }
+            "starting_map" => {
+                game_data.info.starting_map = val.as_str().unwrap().to_string();
             }
             _ => {continue;}
         }
@@ -55,6 +59,7 @@ pub fn process_config(game_data: &mut GameData, config_path: &Path) -> Result<()
     println!("game_data.info.author = {:?}", game_data.info.author);
     println!("game_data.info.min_screen_cols = {:?}", game_data.info.min_screen_cols);
     println!("game_data.info.min_screen_rows = {:?}", game_data.info.min_screen_rows);
+    println!("game_data.info.starting_map = {:?}", game_data.info.starting_map);
     println!();
 
     Ok(())

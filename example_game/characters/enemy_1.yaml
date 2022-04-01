@@ -1,6 +1,7 @@
 ---
 id: "enemy_1"
 name: "Enemy 1"
+icon: "E"
 inventory_size:
   width: 3
   height: 3

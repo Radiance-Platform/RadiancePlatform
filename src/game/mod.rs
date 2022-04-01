@@ -4,6 +4,7 @@ use config_parsers::GameData;
 use crate::game::screen::{Screen, VisualStates};
 
 use crossterm::{event::{read, DisableMouseCapture, EnableMouseCapture, Event, KeyCode}, execute, terminal::{disable_raw_mode, enable_raw_mode}, Result, event};
+use crate::game::maps::Map;
 
 pub mod characters;
 pub mod maps;
@@ -26,6 +27,8 @@ impl Game {
 
         let game_data = config_parsers::GameData::process_configs(config_path);
 
+        println!("{:?}", game_data);
+
         // Create a display object
         let screen = Screen::initialize();
 
@@ -36,6 +39,7 @@ impl Game {
             do_exit: false,
             visual_state: VisualStates::StartScreen,
             cursor_blink: false,
+            current_map_id: GameState::map_from_id(&game_data, &game_data.info.starting_map),
         };
 
         return Game{game_data, game_state, screen};
@@ -98,4 +102,18 @@ pub struct GameState {
     pub do_exit: bool,
     pub visual_state: VisualStates,
     pub cursor_blink: bool,
+    pub current_map_id: usize,
+}
+
+impl GameState {
+    pub fn map_from_id(game_data: &GameData, map_id: &String) -> usize {
+        // Find the map that has an ID matching the provided map_id string
+        for i in 0..game_data.maps.len() {
+            if game_data.maps[i].info.id == map_id.to_string() {
+                return i;
+            }
+        }
+        panic!("Failed to locate map by ID");
+
+    }
 }

@@ -1,5 +1,5 @@
 use std::ffi::OsStr;
-use crate::game::maps::Map;
+use crate::game::maps::{Map, MapInfo};
 use std::path::{Component, Path};
 use std::path::Component::Normal;
 use walkdir::WalkDir;
@@ -7,22 +7,25 @@ use crate::game::characters::Character;
 use crate::game::objects::Object;
 use crate::game::maps::MapData;
 use std::collections::HashMap;
+use crate::game::config_parsers::maps::MapItemData;
 
-use super::maps::MapItemData;
 
 mod characters;
 mod game;
 mod maps;
 mod objects;
 
+#[derive(Debug)]
 pub struct GameInfo {
     pub name: String,
     pub description: String,
     pub author: String,
     pub min_screen_cols: u16,
     pub min_screen_rows: u16,
+    pub starting_map: String,
 }
 
+#[derive(Debug)]
 pub struct GameData {
     pub maps: Vec<Map>,
     pub info: GameInfo,
@@ -39,7 +42,8 @@ impl GameData {
                 description: "".to_string(),
                 author: "".to_string(),
                 min_screen_cols: 0,
-                min_screen_rows: 0
+                min_screen_rows: 0,
+                starting_map: "".to_string(),
             }
         };
 
@@ -82,7 +86,7 @@ impl GameData {
                 if let Some(parent) = parent_opt {
                     // Then check it against our valid parents
                     match parent {
-                        "maps" => { maps::process_config_serde(self, &mut map_item_data, entry.path()); }
+                        "maps" => { maps::process_config_serde(&mut map_item_data, entry.path()); }
                         "characters" => { characters::process_config_serde(self, &mut characters, entry.path()); }
                         "objects" => { objects::process_config(self, &mut objects, entry.path()); }
                         _ => { println!("Found unknown file '{:?}', ignoring", entry.path())}
@@ -96,12 +100,16 @@ impl GameData {
     fn set_map_grid(&mut self, map_item_data: Vec<MapItemData>, characters: HashMap<String, Character>,
                                                                 objects: HashMap< String, Object> ) {
         for map_item in map_item_data {
+            // Apparently using size in the map definition moves size, so let's copy the values out ◔_◔
+            let width = map_item.size.width;
+            let height = map_item.size.height;
             let mut map = Map{
+                info: MapInfo { id: map_item.id, description: map_item.description, size: map_item.size },
                 grid: vec![]
             };
-            map.grid.resize(map_item.size.width as usize, vec![] );
-            for i in 0..(map_item.size.width) {
-                map.grid[i as usize].resize(map_item.size.height as usize, Option::<MapData>::None);
+            map.grid.resize(width as usize, vec![] );
+            for i in 0..(width) {
+                map.grid[i as usize].resize(height as usize, Option::<MapData>::None);
             }
 
             for map_object in map_item.objects {

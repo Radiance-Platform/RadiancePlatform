@@ -1,6 +1,6 @@
 use serde::{Serialize,Deserialize};
 
-#[derive(Debug, Clone)]
+#[derive(Clone, Debug)]
 pub struct ObjectState {
     pub name: String,
     pub value: bool
@@ -15,7 +15,7 @@ pub struct ObjectInteraction {
 */
 
 #[derive(Clone, Debug)]
-pub enum ObjectInteraction {
+pub enum ObjectInteractionCategory {
     ObjectInteractionActivate(ObjectInteractionActivate),
     ObjectInteractionObjectUse(ObjectInteractionObjectUse)
 }
@@ -34,8 +34,12 @@ pub struct ObjectInteractionObjectUse{
     pub consume_item: bool
 }
 
+#[derive(Clone, Debug)]
+pub struct ObjectInteractionWorld {
 
-#[derive(Clone)]
+}
+
+#[derive(Clone, Debug)]
 pub struct Object {
     pub id: String,
     pub name: String,

@@ -1,3 +1,4 @@
+use std::fmt::Debug;
 use crate::game::config_parsers::GameData;
 use crate::game::GameState;
 
@@ -15,6 +16,8 @@ use crossterm::{
 use crossterm::cursor::{DisableBlinking, EnableBlinking, Hide, SetCursorShape, Show};
 use crossterm::event::{Event, KeyCode, KeyEvent, KeyModifiers};
 use crossterm::terminal::{disable_raw_mode, enable_raw_mode, Clear, ClearType};
+use crate::game::maps::MapData;
+use crate::game::maps::MapData::{Character, Object};
 
 pub enum VisualStates {
     StartScreen,
@@ -258,11 +261,77 @@ impl Screen {
 
     // TODO: Implementation, documentation
     fn draw_playing_map(&self, game_data: &GameData, game_state: &mut GameState) -> Result<()> {
+
+        // Clear the screen
+        self.draw_border(0, 0, 80, 20)?;
+
+        // Find the current map that the player is in
+        let map = &game_data.maps[game_state.current_map_id];
+
+        // Create a wrapped version of the map's description
+
+        let text = textwrap::wrap(&map.info.description,80-4);
+
+        // Draw box at the top
+        self.draw_border(0, 0, 80, 6)?;
+
+        // Debug
         execute!(
             stdout(),
             MoveTo(2, 1),
-            Print("Map View")
+            Print("Map View"),
+            MoveTo(2, 2),
+            Print(&game_data.maps[game_state.current_map_id].info.id),
+            MoveTo(2, 3),
         )?;
+
+        // Draw the map room description
+        for i in 0..text.len() {
+            execute!(
+                stdout(),
+                MoveTo(2, 3+i as u16),
+                Print(&text[i]),
+            )?;
+        }
+
+        // Draw the map room itself
+
+        // Border first
+        self.draw_border(2, 7, map.grid.len() as u16, map.grid[0].len() as u16)?;
+
+        // Then items
+        // Go first by each column
+        for c in 0..map.grid.len() {
+            // Then by each row
+            for r in 0..map.grid[c].len() {
+                if map.grid[c][r].is_some() {
+                    match map.grid[c][r].as_ref().unwrap()  {
+                        Character(character) => {
+                            execute!(
+                                stdout(),
+                                MoveTo(c as u16, r as u16),
+                                Print(character.icon),
+                            )?;
+                        }
+                        Object(object) => {
+                            execute!(
+                                stdout(),
+                                MoveTo(c as u16, r as u16),
+                                Print(object.icon),
+                            )?;
+                        }
+                        _ => {
+                            execute!(
+                                stdout(),
+                                MoveTo(c as u16, r as u16),
+                                Print('?'),
+                            )?;
+                        }
+                    }
+                }
+            }
+        }
+
 
         if !game_state.last_character_processed {
 
@@ -296,9 +365,18 @@ impl Screen {
                     )?;
                     game_state.pre_exit = false;
                 }
+            } else if keycode == KeyCode::Char('M') {
+
+                // Change to the next map
+                if game_state.current_map_id + 1 <  game_data.maps.len() {
+                    game_state.current_map_id = game_state.current_map_id + 1;
+                } else {
+                    game_state.current_map_id = 0;
+                }
+
             } else if keycode == KeyCode::Char('H') {
 
-                // Change to map view
+                // Change to home view
                 game_state.visual_state = VisualStates::StartScreen;
                 execute!(
                         stdout(),

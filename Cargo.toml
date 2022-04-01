@@ -13,3 +13,5 @@ rust-embed="6.3.0"
 crossterm = "0.23"
 serde = {version = "1.0.136", features = ["derive"]}
 serde_yaml = "0.8"
+smawk = "0.3"
+textwrap = "0.15"

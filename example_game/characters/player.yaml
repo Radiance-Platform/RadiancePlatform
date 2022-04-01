@@ -1,6 +1,7 @@
 ---
 id: "player"
 name: "You"
+icon: "*"
 inventory_size:
   width: 3
   height: 3

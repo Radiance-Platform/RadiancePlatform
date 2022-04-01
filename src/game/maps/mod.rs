@@ -2,23 +2,23 @@ use serde::{Serialize,Deserialize};
 use crate::game::characters::Character;
 use crate::game::objects::Object;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub enum MapData {
     Character(Character),
     Object(Object)
 }
 
+#[derive(Debug)]
 pub struct Map {
+    pub info: MapInfo,
     pub grid: Vec<Vec<Option<MapData>>>
 }
 
-#[derive(Debug, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct MapItemData {
+#[derive(Debug)]
+pub struct MapInfo {
     pub id: String,
     pub description: String,
     pub size: Size,
-    pub objects: Vec<MapObject>,
 }
 
 #[derive(Debug,Serialize, Deserialize)]
