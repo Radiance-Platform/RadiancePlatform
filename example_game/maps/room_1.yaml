@@ -17,7 +17,7 @@ objects:
     position:
       x: 12
       y: 5
-  - id: "hat"
+  - id: "table"
     position:
       x: 13
       y: 6

@@ -1,6 +1,6 @@
 ---
 id: "table"
-type: "generic"
+category: "collidable"
 icon: "T"
 state:
 interactions:

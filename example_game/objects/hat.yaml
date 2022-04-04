@@ -1,6 +1,6 @@
 ---
 id: "hat"
-type: "collectable"
+category: "collectable"
 icon: "^"
 state:
 interactions:

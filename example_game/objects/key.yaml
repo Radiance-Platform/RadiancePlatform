@@ -1,6 +1,6 @@
 ---
 id: "key"
-type: "usable"
+category: "collectable"
 icon: "K"
 state:
 interactions:

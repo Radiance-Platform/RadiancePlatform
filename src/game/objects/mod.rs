@@ -39,6 +39,14 @@ pub struct ObjectInteractionWorld {
 
 }
 
+// TODO: Object's categories should probably be some sort of type rather than arbitrary strings
+/*pub enum ObjectCategory {
+"simple",
+"collidable"
+"collectable"
+"door"
+}*/
+
 #[derive(Clone, Debug)]
 pub struct Object {
     pub id: String,
@@ -57,8 +65,7 @@ impl Object {
 pub struct ObjectData {
     pub id: String,
     pub name: String,
-    #[serde(rename = "type")]
-    pub type_field: String,
+    pub category: String,
     pub icon: String,
     pub state: Vec<State>,
     pub interactions: Interactions,
@@ -78,8 +85,7 @@ pub struct Interactions {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Activate {
-    #[serde(rename = "type")]
-    pub type_field: String,
+    pub category: String,
     pub prereqs: Prereqs,
     pub destination: String,
 }
@@ -97,8 +103,7 @@ pub struct ActivateState {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct World {
-    #[serde(rename = "type")]
-    pub type_field: String,
+    pub category: String,
     pub affected_by: Vec<AffectedBy>,
     pub self_action: SelfAction,
     pub other_action: OtherAction,

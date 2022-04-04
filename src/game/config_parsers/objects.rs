@@ -47,7 +47,7 @@ pub fn process_config(game_data: &mut GameData,
             "name" => {
                 object.name = val.as_str().unwrap().to_string();
             }
-            "type" => {
+            "category" => {
                 object.category = val.as_str().unwrap().to_string();
             }
             "icon" => {

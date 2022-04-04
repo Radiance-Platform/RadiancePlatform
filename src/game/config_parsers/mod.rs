@@ -25,6 +25,7 @@ pub struct GameInfo {
     pub starting_map: String,
     pub starting_position_x: u16,
     pub starting_position_y: u16,
+    pub player: Option<Character>,
 }
 
 #[derive(Debug)]
@@ -48,6 +49,7 @@ impl GameData {
                 starting_map: "".to_string(),
                 starting_position_x: 0,
                 starting_position_y: 0,
+                player: None
             }
         };
 
@@ -130,14 +132,16 @@ impl GameData {
                 }
             }
 
-            // Add the player if applicable
-            if map.info.id == self.info.starting_map {
-                map.grid[self.info.starting_position_x as usize][self.info.starting_position_y as usize] =
-                    Option::<MapData>::Some(MapData::Character(characters.get("player").unwrap().to_owned()));
-            }
-
             self.maps.push(map);
         }
+
+        // Find and store the player in the state
+        for character in &characters {
+            if character.0 == "player" {
+                self.info.player = Option::<Character>::Some(characters.get("player").unwrap().to_owned());
+            }
+        }
+
     }
 
 }

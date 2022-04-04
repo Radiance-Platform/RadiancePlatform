@@ -20,7 +20,7 @@ These are different categories of objects, which can have different features dep
   - Something in world that the player is not able to walk over, and generally performs no function and is purely decorative
 - Simple
   - Something in world that the player is able to walk over, and generally performs no function and is purely decorative
-- Collectible
+- Collectable
   - Something in world that the player is able to walk over, and can be picked up and put into their inventory on interaction 
 - Door
   - Something in world that the player is able to walk over, and will take the player to another map if it has the state of `unlocked` set to `true`, or able to be unlocked if used with a "key"

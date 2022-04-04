@@ -1,7 +1,7 @@
 ---
 id: "door_2"
 name: "Door"
-type: "door"
+category: "door"
 icon: "X"
 state:
   - id: "unlocked"

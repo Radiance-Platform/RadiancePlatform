@@ -265,7 +265,7 @@ impl Screen {
         self.draw_border(0, 0, 80, 20)?;
 
         // Find the current map that the player is in
-        let map = &game_data.maps[game_state.current_map_id];
+        let map = &game_data.maps[game_state.current_map];
 
         // Create a wrapped version of the map's description
         let description = textwrap::wrap(&map.info.description, 80-4);
@@ -316,6 +316,14 @@ impl Screen {
             }
         }
 
+        // Then the player
+        execute!(
+            stdout(),
+            MoveTo(start_c+game_state.current_player_x, start_r+game_state.current_player_y),
+            Print(game_data.info.player.as_ref().unwrap().icon),
+        )?;
+
+
 
         if !game_state.last_character_processed {
 
@@ -334,16 +342,14 @@ impl Screen {
                 self.handle_exit_key(game_state);
 
             } else if keycode == KeyCode::Char('M') {
-
                 // Change to the next map
-                if game_state.current_map_id + 1 <  game_data.maps.len() {
-                    game_state.current_map_id = game_state.current_map_id + 1;
+                if game_state.current_map + 1 <  game_data.maps.len() {
+                    game_state.current_map = game_state.current_map + 1;
                 } else {
-                    game_state.current_map_id = 0;
+                    game_state.current_map = 0;
                 }
 
             } else if keycode == KeyCode::Char('H') {
-
                 // Change to home view
                 game_state.visual_state = VisualState::StartScreen;
                 execute!(
@@ -351,6 +357,31 @@ impl Screen {
                         MoveTo(10, 11),
                         Print("Changing to start screen")
                     )?;
+
+            } else if keycode == KeyCode::Up {
+                // Handle moving the player upward
+                if self.check_move_available(game_data, game_state, 0, -1) {
+                    game_state.current_player_y -= 1;
+                }
+
+            } else if keycode == KeyCode::Down {
+                // Handle moving the player upward
+                if self.check_move_available(game_data, game_state, 0, 1) {
+                    game_state.current_player_y += 1;
+                }
+
+            } else if keycode == KeyCode::Left {
+                // Handle moving the player upward
+                if self.check_move_available(game_data, game_state, -1, 0) {
+                    game_state.current_player_x -= 1;
+                }
+
+            } else if keycode == KeyCode::Right {
+                // Handle moving the player upward
+                if self.check_move_available(game_data, game_state, 1, 0) {
+                    game_state.current_player_x += 1;
+                }
+
             }
 
 
@@ -366,6 +397,66 @@ impl Screen {
 
         Ok(())
     }
+
+
+    fn check_move_available(&self, game_data: &GameData, game_state: &mut GameState, delta_x: i16, delta_y: i16) -> bool {
+
+        let target_x = game_state.current_player_x as i16 + delta_x;
+        let target_y = game_state.current_player_y as i16 + delta_y;
+        let map = &game_data.maps[game_state.current_map];
+
+        // Check to make sure they can't leave the room boundaries (except for doors)
+        if target_x > 0 && target_x < (map.grid.len()-1) as i16 &&
+           target_y > 0 && target_y < (map.grid[0].len()-1) as i16 {
+            // Ok, they're within the room's boundaries, check objects/characters/empty spaces
+            if map.grid[target_x as usize][target_y as usize].is_some() {
+                // There's something here, find out what it is
+                match map.grid[target_x as usize][target_y as usize].as_ref().unwrap() {
+                    Character(_) => {
+                        // All characters can be walked over (for interacting)
+                        return true;
+                    }
+                    Object(object) => {
+                        // Only collidable objects can't be walked over
+                        match object.category.as_str() {
+                            "collidable" => { return false; }
+                            _ => { return true; }
+                        }
+                    }
+
+                }
+
+            } else {
+                // Empty space, they can obviously go there
+                return true;
+            }
+
+        } else if target_x == 0 || target_x == (map.grid.len()-1) as i16 ||
+            target_y == 0 || target_y == (map.grid[0].len()-1) as i16 {
+            // This is a wall, make sure a door is there
+            if map.grid[target_x as usize][target_y as usize].is_some() {
+                // There's something here, find out what it is
+                match map.grid[target_x as usize][target_y as usize].as_ref().unwrap() {
+                    Object(object) => {
+                        match object.category.as_str() {
+                            "door" => { return true; }
+                            _ => { return false; }
+                        }
+                    }
+                    _ => { return false; } // Although this should never happen (no characters in walls!)
+                }
+            } else {
+                // This is a wall, they cannot enter it
+                return false;
+            }
+        } else {
+            // No idea where they are, but they def shouldn't be there and can't go anywhere
+            return false;
+        }
+
+    }
+
+
 
     // TODO: Implementation, documentation
     fn draw_playing_dialog(&self, game_data: &GameData, game_state: &mut GameState) -> Result<()> {
