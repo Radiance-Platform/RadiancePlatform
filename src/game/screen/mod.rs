@@ -117,12 +117,19 @@ impl Screen {
 
     // Test function to use for making sure I can blink the cursor like when a character is over
     // another object
-    fn blink_cursor(&self, game_state: &mut GameState) -> Result<()> {
-        stdout().execute(MoveTo(78, 18))?;
+    fn blink_player_cursor(&self, game_data: &GameData, game_state: &mut GameState, start_x: u16, start_y: u16, x: u16, y: u16) -> Result<()> {
+        stdout().execute(MoveTo(start_x+x, start_y+y))?;
         if game_state.cursor_blink {
-            stdout().execute(Print("X"))?;
+            // Print character
+            stdout().execute(Print(game_data.info.player.as_ref().unwrap().icon))?;
         } else {
-            stdout().execute(Print("O"))?;
+            // Print whatever map thing is there
+            if game_data.maps[game_state.current_map].grid[x as usize][y as usize].is_some() {
+                match game_data.maps[game_state.current_map].grid[x as usize][y as usize].as_ref().unwrap()  {
+                    Character(character) => { stdout().execute(Print(character.icon))?; }
+                    Object(object) => { stdout().execute(Print(object.icon))?; }
+                }
+            }
         }
 
         game_state.cursor_blink = !game_state.cursor_blink;
@@ -253,8 +260,6 @@ impl Screen {
             }
         }
 
-        self.blink_cursor(game_state)?;
-
         Ok(())
     }
 
@@ -317,14 +322,12 @@ impl Screen {
         }
 
         // Then the player
-        execute!(
-            stdout(),
-            MoveTo(start_c+game_state.current_player_x, start_r+game_state.current_player_y),
-            Print(game_data.info.player.as_ref().unwrap().icon),
-        )?;
+        self.blink_player_cursor(game_data, game_state, start_c, start_r,
+                                 game_state.current_player_x,
+                                 game_state.current_player_y)?;
 
 
-
+        // Process any input the player provided
         if !game_state.last_character_processed {
 
             let keycode = match game_state.last_character_pressed.as_ref().unwrap() {
@@ -334,11 +337,8 @@ impl Screen {
                 _ => { KeyCode::Null }
             };
 
-            // Process exiting the game
-            // TODO: Add processing for other key presses here
-            // For example, control+C via something like
-            // game_state.last_character_pressed.as_ref().unwrap().modifiers == KeyModifiers::CONTROL && keycode == KeyCode::Char('C')
             if keycode == KeyCode::Esc {
+                // Process exiting the game
                 self.handle_exit_key(game_state);
 
             } else if keycode == KeyCode::Char('M') {
@@ -362,28 +362,39 @@ impl Screen {
                 // Handle moving the player upward
                 if self.check_move_available(game_data, game_state, 0, -1) {
                     game_state.current_player_y -= 1;
+                    game_state.cursor_blink = true;
                 }
 
             } else if keycode == KeyCode::Down {
-                // Handle moving the player upward
+                // Handle moving the player downward
                 if self.check_move_available(game_data, game_state, 0, 1) {
                     game_state.current_player_y += 1;
+                    game_state.cursor_blink = true;
                 }
 
             } else if keycode == KeyCode::Left {
-                // Handle moving the player upward
+                // Handle moving the player leftward
                 if self.check_move_available(game_data, game_state, -1, 0) {
                     game_state.current_player_x -= 1;
+                    game_state.cursor_blink = true;
                 }
 
             } else if keycode == KeyCode::Right {
-                // Handle moving the player upward
+                // Handle moving the player rightward
                 if self.check_move_available(game_data, game_state, 1, 0) {
                     game_state.current_player_x += 1;
+                    game_state.cursor_blink = true;
                 }
 
-            }
+            } else if keycode == KeyCode::Enter {
+                // Handle interacting with an object the player is over
+                // TODO: Handle player interactions
 
+            } else if keycode == KeyCode::Char('E') {
+                // Handle opening the player's inventory
+                // TODO: Handle opening the player's inventory
+
+            }
 
             game_state.last_character_processed = true;
             match self.draw(game_data, game_state) {

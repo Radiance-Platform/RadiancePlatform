@@ -36,7 +36,7 @@ impl Game {
             pre_exit: false,
             do_exit: false,
             visual_state: VisualState::StartScreen,
-            cursor_blink: false,
+            cursor_blink: true,
             current_map: GameState::map_from_id(&game_data, &game_data.info.starting_map),
             current_player_x: game_data.info.starting_position_x,
             current_player_y: game_data.info.starting_position_x,
@@ -72,7 +72,7 @@ impl Game {
         // Blocking read
         //self.game_state.last_character_pressed = read();
 
-        if crossterm::event::poll(std::time::Duration::from_millis(1000)).expect("Error") {
+        if crossterm::event::poll(std::time::Duration::from_millis(500)).expect("Error") {
             self.game_state.last_character_pressed = crossterm::event::read();
             self.game_state.last_character_processed = false;
         }
