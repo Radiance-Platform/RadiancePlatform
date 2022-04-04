@@ -48,6 +48,18 @@ pub fn process_config(game_data: &mut GameData, config_path: &Path) -> Result<()
             "starting_map" => {
                 game_data.info.starting_map = val.as_str().unwrap().to_string();
             }
+            "starting_position" => {
+                let x_key = yaml_rust::Yaml::from_str("x");
+                let x = val.as_hash().unwrap()
+                    .get(&x_key).unwrap_or(&key)
+                    .as_i64().unwrap();
+                let y_key = yaml_rust::Yaml::from_str("y");
+                let y = val.as_hash().unwrap()
+                    .get(&y_key).unwrap_or(&key)
+                    .as_i64().unwrap();
+                game_data.info.starting_position_x = x as u16;
+                game_data.info.starting_position_y = y as u16;
+            }
             _ => {continue;}
         }
     }

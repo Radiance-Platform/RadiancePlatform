@@ -23,6 +23,8 @@ pub struct GameInfo {
     pub min_screen_cols: u16,
     pub min_screen_rows: u16,
     pub starting_map: String,
+    pub starting_position_x: u16,
+    pub starting_position_y: u16,
 }
 
 #[derive(Debug)]
@@ -44,6 +46,8 @@ impl GameData {
                 min_screen_cols: 0,
                 min_screen_rows: 0,
                 starting_map: "".to_string(),
+                starting_position_x: 0,
+                starting_position_y: 0,
             }
         };
 
@@ -125,6 +129,13 @@ impl GameData {
                     map.grid[pos_x][pos_y] = Option::<MapData>::Some(MapData::Object(object.unwrap().to_owned()));
                 }
             }
+
+            // Add the player if applicable
+            if map.info.id == self.info.starting_map {
+                map.grid[self.info.starting_position_x as usize][self.info.starting_position_y as usize] =
+                    Option::<MapData>::Some(MapData::Character(characters.get("player").unwrap().to_owned()));
+            }
+
             self.maps.push(map);
         }
     }
