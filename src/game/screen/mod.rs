@@ -179,20 +179,27 @@ impl Screen {
         let mut lines = Vec::<&str>::new();
         let name_line = format!("Welcome to {}", game_data.info.name);
         let author_line = format!("Written by {}", game_data.info.author);
+        let description_lines = textwrap::wrap(&game_data.info.description, (self.current_columns - 12) as usize);
+
         lines.push(&name_line);
         lines.push(&author_line);
         lines.push("Powered by the Radiance Platform");
         lines.push("");
+
+        for l in &description_lines {
+            lines.push(l.as_ref());
+        }
+
         lines.push("");
         lines.push("Controls:");
-        lines.push("Use WASD or the Arrow Keys to move around");
-        lines.push("Use space to interact with objects in the world");
-        lines.push("Use E to open your inventory,");
-        lines.push("WASD/Arrows to move within, and space to select");
-        lines.push("Press enter to select options within dialog boxes");
+        lines.push("Use WASD or the Arrow Keys to move around the world.");
+        lines.push("Use space to interact with objects in the world.");
+        lines.push("Use E to open your inventory, WASD/Arrows");
+        lines.push("to move within, and Enter to select items.");
+        lines.push("Press Enter to select options within dialog boxes.");
         lines.push("");
         lines.push("");
-        lines.push("Press Enter to start the game");
+        lines.push("Press Enter to start the game.");
 
         let mut row = self.vertically_center_start_position(lines.len() as u16);
         for line in lines {
@@ -203,23 +210,6 @@ impl Screen {
             )?;
             row += 1;
         }
-            /*
-        execute!(
-                stdout(),
-                MoveTo(5, 2),
-                Print("Welcome to "),
-                Print(&game_data.info.name),
-                MoveTo(5, 3),
-                Print("Written by "),
-                Print(&game_data.info.author),
-                MoveTo(5, 4),
-                Print("Powered by The Radiance Platform"),
-                MoveTo(5, 5),
-                Print("WORK IN PROGRESS: Current functionality consists of recognizing"),
-                MoveTo(5, 6),
-                Print("key presses, and handling pressing `C` to exit."),
-            )?;
-            */
 
         if !game_state.last_character_processed {
 
@@ -229,27 +219,6 @@ impl Screen {
                 },
                 _ => { KeyCode::Null }
             };
-
-            //let keycode2 = game_state.last_character_pressed.as_ref().unwrap();
-
-            // Something to look into
-            /* match event {
-                    KeyEvent {
-                        code: KeyCode::Char('q'),
-                        modifiers: event::KeyModifiers::NONE,
-                    } => break,
-                    _ => {
-                    }
-                }
-             */
-
-            execute!(
-                stdout(),
-                MoveTo(10, 10),
-                Print("Received keycode: "),
-                Print(format!("{:?} ", keycode)),
-                //Print(format!("{:?}", keycode2)),
-            )?;
 
             // Process exiting the game
             // TODO: Add processing for other key presses here

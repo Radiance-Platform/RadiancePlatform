@@ -1,6 +1,6 @@
 ---
-name: "Radiance Example Game"
-description: "This is a small game to demonstrate the Radiance Platform's capabilities."
+name: "The Radiance Platform Example Game"
+description: "This is a small game to demonstrate the Radiance Platform's capabilities and configuration system."
 author: "The Radiance Team"
 min_screen_size:
   width: 80
