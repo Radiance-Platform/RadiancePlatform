@@ -101,19 +101,18 @@ impl Screen {
 
     }
 
-    // TODO: Function to take in a string and determine what column it should start being printed at
+    // Function to take in a string and determine what column it should start being printed at
     // in order to horizontally center it. `s` should be the string to center.
     fn horizontally_center_start_position(&self, s: &str) -> u16 {
-        // TODO: Read current_columns and length of s to calculate proper positioning
         let empty_space = self.current_columns - (s.len() as u16);
         return empty_space/2;
     }
 
-    // TODO: Function to take in a number of lines and determine what row (line) they should start
+    // Function to take in a number of lines and determine what row (line) they should start
     // being printed at in order to vertically center them.
     fn vertically_center_start_position(&self, c: u16) -> u16 {
-        // TODO: Read current_rows and c to calculate proper positioning
-        return 0;
+        let empty_space = self.current_rows - c;
+        return empty_space/2;
     }
 
     // Test function to use for making sure I can blink the cursor like when a character is over
@@ -193,7 +192,7 @@ impl Screen {
         lines.push("".to_string());
         lines.push("Press Enter to start the game".to_string());
 
-        let mut row = 2;
+        let mut row = self.vertically_center_start_position(lines.len() as u16);
         for line in lines {
             execute!(
                 stdout(),
