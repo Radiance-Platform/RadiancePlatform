@@ -340,28 +340,28 @@ impl Screen {
                         Print("Changing to start screen")
                     )?;
 
-            } else if keycode == KeyCode::Up {
+            } else if keycode == KeyCode::Up || keycode == KeyCode::Char('w') {
                 // Handle moving the player upward
                 if self.check_move_available(game_data, game_state, 0, -1) {
                     game_state.current_player_y -= 1;
                     game_state.cursor_blink = true;
                 }
 
-            } else if keycode == KeyCode::Down {
+            } else if keycode == KeyCode::Down || keycode == KeyCode::Char('s') {
                 // Handle moving the player downward
                 if self.check_move_available(game_data, game_state, 0, 1) {
                     game_state.current_player_y += 1;
                     game_state.cursor_blink = true;
                 }
 
-            } else if keycode == KeyCode::Left {
+            } else if keycode == KeyCode::Left || keycode == KeyCode::Char('a') {
                 // Handle moving the player leftward
                 if self.check_move_available(game_data, game_state, -1, 0) {
                     game_state.current_player_x -= 1;
                     game_state.cursor_blink = true;
                 }
 
-            } else if keycode == KeyCode::Right {
+            } else if keycode == KeyCode::Right || keycode == KeyCode::Char('d') {
                 // Handle moving the player rightward
                 if self.check_move_available(game_data, game_state, 1, 0) {
                     game_state.current_player_x += 1;
@@ -545,6 +545,17 @@ impl Screen {
                     // Set up the result and return to the previous screen
                     game_state.dialog_result_ready = true;
                 }
+
+                // Reset selected dialog button
+                game_state.dialog_selected = 0;
+
+            } else if keycode == KeyCode::Esc {
+                // Set up the (lack of) result and return to the previous screen
+                game_state.dialog_result_ready = false;
+                game_state.visual_state = game_state.dialog_return_to.clone();
+                
+                // Reset selected dialog button
+                game_state.dialog_selected = 0;
 
             } else if keycode == KeyCode::Char('H') {
 
