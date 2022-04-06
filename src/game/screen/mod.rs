@@ -227,24 +227,9 @@ impl Screen {
             if keycode == KeyCode::Esc {
                 self.handle_exit_key(game_state);
 
-            } else if keycode == KeyCode::Char('M') {
+            } else if keycode == KeyCode::Enter {
                 // Change to map view
                 game_state.visual_state = VisualState::PlayingMap;
-                execute!(
-                    stdout(),
-                    MoveTo(10, 11),
-                    Print("Changing to map view")
-                )?;
-
-            } else if keycode == KeyCode::Char('D') {
-                // Change to dialog view
-                game_state.visual_state = VisualState::PlayingDialog;
-                execute!(
-                    stdout(),
-                    MoveTo(10, 11),
-                    Print("Changing to dialog view")
-                )?;
-
             }
 
             game_state.last_character_processed = true;
@@ -252,7 +237,7 @@ impl Screen {
                 Ok(_) => {},
                 Err(_) => {
                     println!("ERROR: Problem encountered while drawing screen, exiting!");
-                    self.end();
+                    self.end()?;
                 }
             }
         }
@@ -398,7 +383,7 @@ impl Screen {
                 Ok(_) => {},
                 Err(_) => {
                     println!("ERROR: Problem encountered while drawing screen, exiting!");
-                    self.end();
+                    self.end()?;
                 }
             }
         }
@@ -588,7 +573,7 @@ impl Screen {
                 Ok(_) => {},
                 Err(_) => {
                     println!("ERROR: Problem encountered while drawing screen, exiting!");
-                    self.end();
+                    self.end()?;
                 }
             }
         }
