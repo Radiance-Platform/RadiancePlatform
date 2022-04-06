@@ -176,27 +176,29 @@ impl Screen {
     fn draw_start_screen(&self, game_data: &GameData, game_state: &mut GameState) -> Result<()> {
         self.draw_border(0, 0, 80, 20)?;
         // Print game info
-        let mut lines = Vec::<String>::new();
-        lines.push(format!("Welcome to {}", game_data.info.name));
-        lines.push(format!("Written by {}", game_data.info.author));
-        lines.push("Powered by the Radiance Platform".to_string());
-        lines.push("".to_string());
-        lines.push("".to_string());
-        lines.push("Controls:".to_string());
-        lines.push("Use WASD or the Arrow Keys to move around".to_string());
-        lines.push("Use space to interact with objects in the world".to_string());
-        lines.push("Use E to open your inventory,".to_string());
-        lines.push("WASD/Arrows to move within, and space to select".to_string());
-        lines.push("Press enter to select options within dialog boxes".to_string());
-        lines.push("".to_string());
-        lines.push("".to_string());
-        lines.push("Press Enter to start the game".to_string());
+        let mut lines = Vec::<&str>::new();
+        let name_line = format!("Welcome to {}", game_data.info.name);
+        let author_line = format!("Written by {}", game_data.info.author);
+        lines.push(&name_line);
+        lines.push(&author_line);
+        lines.push("Powered by the Radiance Platform");
+        lines.push("");
+        lines.push("");
+        lines.push("Controls:");
+        lines.push("Use WASD or the Arrow Keys to move around");
+        lines.push("Use space to interact with objects in the world");
+        lines.push("Use E to open your inventory,");
+        lines.push("WASD/Arrows to move within, and space to select");
+        lines.push("Press enter to select options within dialog boxes");
+        lines.push("");
+        lines.push("");
+        lines.push("Press Enter to start the game");
 
         let mut row = self.vertically_center_start_position(lines.len() as u16);
         for line in lines {
             execute!(
                 stdout(),
-                MoveTo(self.horizontally_center_start_position(&line), row),
+                MoveTo(self.horizontally_center_start_position(line), row),
                 Print(line),
             )?;
             row += 1;
