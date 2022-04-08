@@ -7,6 +7,7 @@ use crate::game::characters::{Character, CharacterData};
 use crate::game::characters::role::Role;
 use crate::game::config_parsers::GameData;
 use crate::game::characters::attribute::Attribute;
+use crate::game::objects::Object;
 
 
 pub fn process_config_serde(game_data: & mut GameData, 
@@ -29,8 +30,13 @@ fn get_character_from_data(characters: &mut HashMap<String, Character>, data: Ch
         name: "".to_string(),
         role: Role { role: "".to_string() },
         attributes: vec![],
+        inventory: vec![],
         icon: ' ',
     };
+    character.inventory.resize(data.inventory_size.width as usize, vec![] );
+    for i in 0..(data.inventory_size.width) {
+        character.inventory[i as usize].resize(data.inventory_size.height as usize, Option::<Object>::None);
+    }
     character.name = data.id;
     character.icon = data.icon;
     //character.role = data.role;

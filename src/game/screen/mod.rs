@@ -170,7 +170,16 @@ impl Screen {
     fn activate_object(&self, game_state: &mut GameState, game_data: &GameData, object: &Object) {
         match object.category.as_str() {
             "collectable" => {
-                //collect_object(object);
+                /* TEST: Just pick up the item whether you say to or not. */
+                self.collect_object(game_state, game_data, object);
+                // display "found item" dialog
+                game_state.dialog_message = format!("You've found the {}!\n\nNow, what will you do with it?"
+                                                    , object.name);
+                game_state.dialog_option_0 = "Open inventory".to_string();
+                game_state.dialog_option_1 = "Close".to_string();
+                game_state.dialog_return_to = game_state.visual_state.clone();
+                game_state.pre_exit = false;
+                game_state.visual_state = VisualState::PlayingDialog;
                 return;
             }
             _ => {
@@ -193,11 +202,19 @@ impl Screen {
         }
     }
 
+    fn collect_object(&self, game_state: &mut GameState, game_data: &GameData, object: &Object) {
+        // If inventory size is not exceeded, add item to player inventory
+        if game_data.info.player.is_none() {
+            return;
+        }
+        //game_data.info.player.as_ref().unwrap().collect_object(object);
+        // Remove item from map
+    }
+
     // Moves character to a different map through the specified door
     // Assume prereqs are already checked.
     fn travel_through_door(&self, game_state: &mut GameState, game_data: &GameData, door: &Object) {
         // find door
-        //let current_map = &game_data.maps[game_state.current_map];
         // Go through each map
         for m in 0..game_data.maps.len() {
             let map = &game_data.maps[m];
@@ -626,6 +643,7 @@ impl Screen {
                 } else {
                     // Set up the result and return to the previous screen
                     game_state.dialog_result_ready = true;
+                    game_state.visual_state = game_state.dialog_return_to.clone();
                 }
 
                 // Reset selected dialog button

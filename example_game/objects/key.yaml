@@ -1,5 +1,6 @@
 ---
 id: "key"
+name: "Key"
 category: "collectable"
 icon: "K"
 state:
