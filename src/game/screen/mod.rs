@@ -166,6 +166,7 @@ impl Screen {
         }
     }
 
+    // Starts any interaction that happens when an object is activated with the interact key
     fn activate_object(&self, game_state: &mut GameState, game_data: &GameData, object: &Object) {
         match object.category.as_str() {
             "collectable" => {
@@ -179,19 +180,50 @@ impl Screen {
             match interaction {
                 ObjectInteraction::ObjectInteractionActivate(activate) => {
                     if !object.prereqs_met(&activate.prereqs) {
+                        // TODO: Display a message here?
                         continue;
                     }
                     if activate.category == "travel" {
-                        //travel_through_door(object);
-                        /* TEST */
-                        if game_state.current_map + 1 <  game_data.maps.len() {
-                            game_state.current_map = game_state.current_map + 1;
-                        } else {
-                            game_state.current_map = 0;
-                        }
+                        self.travel_through_door(game_state, game_data, object);
                     }
                 }
                 ObjectInteraction::ObjectInteractionObjectUse(_object_use) => {
+                }
+            }
+        }
+    }
+
+    // Moves character to a different map through the specified door
+    // Assume prereqs are already checked.
+    fn travel_through_door(&self, game_state: &mut GameState, game_data: &GameData, door: &Object) {
+        // find door
+        //let current_map = &game_data.maps[game_state.current_map];
+        // Go through each map
+        for m in 0..game_data.maps.len() {
+            let map = &game_data.maps[m];
+            // Door should not be in the same map as the current map
+            if m == game_state.current_map {
+                continue;
+            }
+            // Look at every square in the map
+            for c in 0..map.grid.len() {
+                // Then by each row
+                for r in 0..map.grid[c].len() {
+                    if map.grid[c][r].is_some() {
+                        match map.grid[c][r].as_ref().unwrap()  {
+                            MapData::Character(_character) => {
+                            }
+                            MapData::Object(object) => {
+                                if object.id == door.id { // If correct door is found
+                                    // Move character to new door
+                                    game_state.current_map = m;
+                                    game_state.current_player_x = c as u16;
+                                    game_state.current_player_y = r as u16;
+                                    return;
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
