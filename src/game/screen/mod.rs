@@ -15,7 +15,10 @@ use crossterm::{
 use crossterm::cursor::{Hide, Show};
 use crossterm::event::{Event, KeyCode, KeyModifiers};
 use crossterm::terminal::{disable_raw_mode, enable_raw_mode, Clear, ClearType};
-use crate::game::maps::MapData::{Character, Object};
+//use crate::game::maps::MapData{Character, Object};
+use crate::game::maps::MapData;
+use super::objects::{ObjectInteraction, Object};
+//use crate::game::objects::Object;
 
 #[derive(Clone, Debug)]
 pub enum VisualState {
@@ -126,8 +129,8 @@ impl Screen {
             // Print whatever map thing is there
             if game_data.maps[game_state.current_map].grid[x as usize][y as usize].is_some() {
                 match game_data.maps[game_state.current_map].grid[x as usize][y as usize].as_ref().unwrap()  {
-                    Character(character) => { stdout().execute(Print(character.icon))?; }
-                    Object(object) => { stdout().execute(Print(object.icon))?; }
+                    MapData::Character(character) => { stdout().execute(Print(character.icon))?; }
+                    MapData::Object(object) => { stdout().execute(Print(object.icon))?; }
                 }
             }
         }
@@ -145,6 +148,53 @@ impl Screen {
         game_state.dialog_return_to = game_state.visual_state.clone();
         game_state.visual_state = VisualState::PlayingDialog;
         game_state.pre_exit = true;
+    }
+
+    fn handle_interact_key(&self, game_state: &mut GameState, game_data: &GameData) {
+        let map = &game_data.maps[game_state.current_map];
+        let player_x = game_state.current_player_x as usize;
+        let player_y = game_state.current_player_y as usize;
+        if map.grid[player_x][player_y].is_some() {
+            match map.grid[player_x][player_y].as_ref().unwrap()  {
+                MapData::Character(character) => {
+                    // TODO: Handle character interaction
+                }
+                MapData::Object(object) => {
+                    self.activate_object(game_state, game_data, object);
+                }
+            }
+        }
+    }
+
+    fn activate_object(&self, game_state: &mut GameState, game_data: &GameData, object: &Object) {
+        match object.category.as_str() {
+            "collectable" => {
+                //collect_object(object);
+                return;
+            }
+            _ => {
+            }
+        }
+        for interaction in &object.interactions {
+            match interaction {
+                ObjectInteraction::ObjectInteractionActivate(activate) => {
+                    if !object.prereqs_met(&activate.prereqs) {
+                        continue;
+                    }
+                    if activate.category == "travel" {
+                        //travel_through_door(object);
+                        /* TEST */
+                        if game_state.current_map + 1 <  game_data.maps.len() {
+                            game_state.current_map = game_state.current_map + 1;
+                        } else {
+                            game_state.current_map = 0;
+                        }
+                    }
+                }
+                ObjectInteraction::ObjectInteractionObjectUse(_object_use) => {
+                }
+            }
+        }
     }
 
     fn draw_border(&self, start_col: u16, start_row: u16, cols: u16, rows: u16) -> Result<()> {
@@ -284,14 +334,14 @@ impl Screen {
             for r in 0..map.grid[c].len() {
                 if map.grid[c][r].is_some() {
                     match map.grid[c][r].as_ref().unwrap()  {
-                        Character(character) => {
+                        MapData::Character(character) => {
                             execute!(
                                 stdout(),
                                 MoveTo(start_c+c as u16, start_r+r as u16),
                                 Print(character.icon),
                             )?;
                         }
-                        Object(object) => {
+                        MapData::Object(object) => {
                             execute!(
                                 stdout(),
                                 MoveTo(start_c+c as u16, start_r+r as u16),
@@ -368,10 +418,10 @@ impl Screen {
                     game_state.cursor_blink = true;
                 }
 
-            } else if keycode == KeyCode::Enter {
+            } else if keycode == KeyCode::Char(' ') {
                 // Handle interacting with an object the player is over
                 // TODO: Handle player interactions
-
+                self.handle_interact_key(game_state, game_data);
             } else if keycode == KeyCode::Char('E') {
                 // Handle opening the player's inventory
                 // TODO: Handle opening the player's inventory
@@ -405,11 +455,11 @@ impl Screen {
             if map.grid[target_x as usize][target_y as usize].is_some() {
                 // There's something here, find out what it is
                 match map.grid[target_x as usize][target_y as usize].as_ref().unwrap() {
-                    Character(_) => {
+                    MapData::Character(_) => {
                         // All characters can be walked over (for interacting)
                         return true;
                     }
-                    Object(object) => {
+                    MapData::Object(object) => {
                         // Only collidable objects can't be walked over
                         match object.category.as_str() {
                             "collidable" => { return false; }
@@ -430,7 +480,7 @@ impl Screen {
             if map.grid[target_x as usize][target_y as usize].is_some() {
                 // There's something here, find out what it is
                 match map.grid[target_x as usize][target_y as usize].as_ref().unwrap() {
-                    Object(object) => {
+                    MapData::Object(object) => {
                         match object.category.as_str() {
                             "door" => { return true; }
                             _ => { return false; }

@@ -58,7 +58,23 @@ pub struct Object {
 }
 
 impl Object {
+    pub fn prereqs_met(&self, prereqs: &Vec<ObjectState>) -> bool {
+        for prereq in prereqs {
+            if self.get_state(&prereq.name) != prereq.value {
+                return false;
+            }
+        }
+        return true;
+    }
 
+    pub fn get_state(&self, state_name: &String) -> bool {
+        for s in &self.state {
+            if s.name.eq(state_name) {
+                return s.value;
+            }
+        }
+        return false;
+    }
 }
 
 #[derive(Debug, Serialize, Deserialize)]
