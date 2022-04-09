@@ -55,7 +55,7 @@ impl Game {
     pub fn start(&mut self) {
 
         println!("Starting game");
-        match self.screen.draw(&self.game_data, &mut self.game_state) {
+        match self.screen.draw(&mut self.game_data, &mut self.game_state) {
             Ok(_) => {},
             Err(_) => {
                 println!("ERROR: Problem encountered while drawing screen, exiting!");
@@ -78,7 +78,7 @@ impl Game {
         }
 
 
-        match self.screen.draw(&self.game_data, &mut self.game_state) {
+        match self.screen.draw(&mut self.game_data, &mut self.game_state) {
             Ok(_) => {},
             Err(_) => {
                 println!("ERROR: Problem encountered while drawing screen, exiting!");

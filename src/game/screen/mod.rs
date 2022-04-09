@@ -17,6 +17,7 @@ use crossterm::event::{Event, KeyCode, KeyModifiers};
 use crossterm::terminal::{disable_raw_mode, enable_raw_mode, Clear, ClearType};
 //use crate::game::maps::MapData{Character, Object};
 use crate::game::maps::MapData;
+use crate::game::characters::Character;
 use super::objects::{ObjectInteraction, Object};
 //use crate::game::objects::Object;
 
@@ -150,8 +151,8 @@ impl Screen {
         game_state.pre_exit = true;
     }
 
-    fn handle_interact_key(&self, game_state: &mut GameState, game_data: &GameData) {
-        let map = &game_data.maps[game_state.current_map];
+    fn handle_interact_key(&self, game_state: &mut GameState, game_data: &mut GameData) {
+        let map = &game_data.maps[game_state.current_map].clone();
         let player_x = game_state.current_player_x as usize;
         let player_y = game_state.current_player_y as usize;
         if map.grid[player_x][player_y].is_some() {
@@ -167,7 +168,7 @@ impl Screen {
     }
 
     // Starts any interaction that happens when an object is activated with the interact key
-    fn activate_object(&self, game_state: &mut GameState, game_data: &GameData, object: &Object) {
+    fn activate_object(&self, game_state: &mut GameState, game_data: &mut GameData, object: &Object) {
         match object.category.as_str() {
             "collectable" => {
                 /* TEST: Just pick up the item whether you say to or not. */
@@ -202,13 +203,18 @@ impl Screen {
         }
     }
 
-    fn collect_object(&self, game_state: &mut GameState, game_data: &GameData, object: &Object) {
+    fn collect_object(&self, game_state: &mut GameState, game_data: &mut GameData, object: &Object) {
         // If inventory size is not exceeded, add item to player inventory
         if game_data.info.player.is_none() {
             return;
         }
-        //game_data.info.player.as_ref().unwrap().collect_object(object);
+        let mut player = game_data.info.player.as_ref().unwrap().clone();
+        player.collect_object(object);
+        game_data.info.player = Option::<Character>::Some(player);
         // Remove item from map
+        game_data.maps[game_state.current_map]
+                 .grid[game_state.current_player_x as usize][game_state.current_player_y as usize]
+                 = Option::None;
     }
 
     // Moves character to a different map through the specified door
@@ -272,7 +278,7 @@ impl Screen {
     }
 
     // TODO: Implementation, documentation
-    fn draw_start_screen(&self, game_data: &GameData, game_state: &mut GameState) -> Result<()> {
+    fn draw_start_screen(&self, game_data: &mut GameData, game_state: &mut GameState) -> Result<()> {
         self.draw_border(0, 0, 80, 20)?;
         // Print game info
         let mut lines = Vec::<&str>::new();
@@ -345,7 +351,7 @@ impl Screen {
     }
 
     // TODO: Implementation, documentation
-    fn draw_playing_map(&self, game_data: &GameData, game_state: &mut GameState) -> Result<()> {
+    fn draw_playing_map(&self, game_data: &mut GameData, game_state: &mut GameState) -> Result<()> {
 
         // Clear the screen
         self.draw_border(0, 0, 80, 20)?;
@@ -551,7 +557,7 @@ impl Screen {
 
 
     // TODO: Implementation, documentation
-    fn draw_playing_dialog(&self, game_data: &GameData, game_state: &mut GameState) -> Result<()> {
+    fn draw_playing_dialog(&self, game_data: &mut GameData, game_state: &mut GameState) -> Result<()> {
 
         // Dialog box width
         let cols = 80;
@@ -711,7 +717,7 @@ impl Screen {
     }
 
     // TODO: Documentation
-    pub fn draw(&self, game_data: &GameData, game_state: &mut GameState) -> Result<()> {
+    pub fn draw(&self, game_data: &mut GameData, game_state: &mut GameState) -> Result<()> {
 
         //self.draw_border(0, 0, 80, 20)?;
 
