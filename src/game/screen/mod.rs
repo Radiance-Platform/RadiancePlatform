@@ -303,7 +303,7 @@ impl Screen {
         lines.push("");
         lines.push("Controls:");
         lines.push("Use WASD or the Arrow Keys to move around the world.");
-        lines.push("Use space to interact with objects in the world.");
+        lines.push("Use Enter to interact with objects in the world.");
         lines.push("Use E to open your inventory, WASD/Arrows");
         lines.push("to move within, and Enter to select items.");
         lines.push("Press Enter to select options within dialog boxes.");
@@ -478,7 +478,7 @@ impl Screen {
                     game_state.cursor_blink = true;
                 }
 
-            } else if keycode == KeyCode::Char(' ') {
+            } else if keycode == KeyCode::Enter {
                 // Handle interacting with an object the player is over
                 // TODO: Handle player interactions
                 self.handle_interact_key(game_state, game_data);
