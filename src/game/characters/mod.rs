@@ -17,6 +17,7 @@ pub struct Character {
 }
 
 impl Character {
+    // Adds specified object to inventory
     pub fn collect_object(&mut self, object: &Object) {
         for c in 0..self.inventory.len() {
             for r in 0..self.inventory[c].len() {

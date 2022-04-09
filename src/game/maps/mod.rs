@@ -2,6 +2,10 @@ use serde::{Serialize,Deserialize};
 use crate::game::characters::Character;
 use crate::game::objects::Object;
 
+// Map data structure. Contains a single map with a grid of spaces.
+//      Each space can hold either nothing, a character, or
+//      an object.
+
 #[derive(Clone, Debug)]
 pub enum MapData {
     Character(Character),

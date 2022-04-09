@@ -41,6 +41,8 @@ pub struct Screen {
 
 impl Screen {
 
+    // Throw an error if the terminal size is too small to run the game
+    //      (Terminal must be 80x20)
     fn check_screen_size() -> Result<()> {
         let error_terminal_too_small = Error::new(ErrorKind::Other, "Terminal size is too small, must be at least 80x20");
         let (cols, rows) = size()?;
@@ -51,6 +53,7 @@ impl Screen {
         }
     }
 
+    // Set up the screen to display the game
     pub fn initialize() -> Screen {
         // Get the original size
         let (orig_cols, orig_rows) = size().unwrap();
@@ -156,6 +159,7 @@ impl Screen {
         game_state.pre_exit = true;
     }
 
+    // Function for handling object interactions (when the "interact" key is pressed)
     fn handle_interact_key(&self, game_state: &mut GameState, game_data: &mut GameData) {
         let map = &game_data.maps[game_state.current_map].clone();
         let player_x = game_state.current_player_x as usize;
@@ -176,7 +180,7 @@ impl Screen {
     fn activate_object(&self, game_state: &mut GameState, game_data: &mut GameData, object: &Object) {
         match object.category.as_str() {
             "collectable" => {
-                /* TEST: Just pick up the item whether you say to or not. */
+                // Remove item from map and add to inventory
                 self.collect_object(game_state, game_data, object);
                 // display "found item" dialog
                 game_state.dialog_message = format!("You've found the {}!\n\nNow, what will you do with it?"
@@ -186,6 +190,7 @@ impl Screen {
                 game_state.dialog_return_to = game_state.visual_state.clone();
                 game_state.pre_exit = false;
                 game_state.visual_state = VisualState::PlayingDialog;
+                // TODO: Have selecting "Open inventory" in the dialog draw the inventory screen.  
                 return;
             }
             _ => {
@@ -283,7 +288,6 @@ impl Screen {
     }
 
     // Draws the start screen with the game name, author, description, and instructions for how to play
-    // TODO: Implementation, documentation
     fn draw_start_screen(&self, game_data: &mut GameData, game_state: &mut GameState) -> Result<()> {
         self.draw_border(0, 0, 80, 20)?;
         // Print game info
@@ -358,7 +362,6 @@ impl Screen {
 
     // Draws the playing map (main gameplay screen) and handles keypress input for moving the character,
     //      item interaction, and changing screens.
-    // TODO: Implementation, documentation
     fn draw_playing_map(&self, game_data: &mut GameData, game_state: &mut GameState) -> Result<()> {
 
         // Clear the screen
@@ -483,11 +486,9 @@ impl Screen {
 
             } else if keycode == KeyCode::Enter {
                 // Handle interacting with an object the player is over
-                // TODO: Handle player interactions
                 self.handle_interact_key(game_state, game_data);
             } else if keycode == KeyCode::Char('E') || keycode == KeyCode::Char('e') {
                 // Handle opening the player's inventory
-                // TODO: Handle opening the player's inventory
                 game_state.visual_state = VisualState::PlayingInventory;
                 execute!(
                         stdout(),
@@ -573,7 +574,6 @@ impl Screen {
 
     // Draws a 50 x 12 dialog box with two buttons. Dialog and button text is specified in game_state.
     // Handles key presses and button highlighting.
-    // TODO: Implementation, documentation
     fn draw_playing_dialog(&self, game_data: &mut GameData, game_state: &mut GameState) -> Result<()> {
 
         // Dialog box width
@@ -624,7 +624,6 @@ impl Screen {
         }
 
         // Display button text
-        // TODO: Proper centering of the text
         let center_0 = (cols-width)/2 +
                             self.horizontally_center_start_position_width(&game_state.dialog_option_0, width/2);
         let center_1 = cols/2 +
@@ -723,7 +722,7 @@ impl Screen {
 
     // Draws inventory/stat screen.
     // Handles key presses.
-    // TODO: Implementation, documentation
+    // TODO: Improve layout
     fn draw_playing_inventory(&self, game_data: &mut GameData, game_state: &mut GameState) -> Result<()> {
         // Dialog box width
         let cols = self.current_columns;
@@ -809,7 +808,6 @@ impl Screen {
     }
 
     // Draws the screen specified by VisualState.
-    // TODO: Documentation
     pub fn draw(&self, game_data: &mut GameData, game_state: &mut GameState) -> Result<()> {
 
         //self.draw_border(0, 0, 80, 20)?;
@@ -848,6 +846,7 @@ impl Screen {
         Ok(())
     }
 
+    // Resets the terminal to a usable state
     fn reset(&self) -> Result<()> {
         // Be a good citizen and cleanup the terminal for program exit
 

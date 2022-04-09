@@ -9,6 +9,8 @@ use crate::game::objects::{Object, ObjectData, ObjectState,
                            ObjectInteraction, ObjectInteractionActivate,
                            ObjectInteractionObjectUse};
 
+// Takes an object config file and loads it into an object, then adds that object to the objects list
+//      so that it can later be added to the game map.
 pub fn process_config(game_data: &mut GameData,
                       objects: &mut HashMap<String, Object>, config_path: &Path) -> Result<(), Box<dyn Error>> {
 
@@ -67,6 +69,9 @@ pub fn process_config(game_data: &mut GameData,
 
     Ok(())
 }
+
+
+// Parsing functions for individual components of the object are below.
 
 fn parse_object_interactions( object: &mut Object, yaml_interactions: &Yaml) {
     let interaction_hash = yaml_interactions.as_hash().unwrap();
