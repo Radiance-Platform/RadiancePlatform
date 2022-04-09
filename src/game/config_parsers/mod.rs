@@ -35,6 +35,8 @@ pub struct GameData {
 }
 
 impl GameData {
+
+    // Creates GameData object then reads through all config files and parses them
     pub fn process_configs(config_path: std::path::PathBuf) -> GameData {
         println!("Parsing configs");
 
@@ -58,6 +60,7 @@ impl GameData {
         return game_data;
     }
 
+    // Parses config files into game structs
     fn scan_config(&mut self, config_path: std::path::PathBuf) {
 
         // As the configs are read, everything is thrown in these vectors, then after all are read, they get put into the actual map objects
@@ -103,6 +106,8 @@ impl GameData {
         self.set_map_grid(map_item_data, characters, objects);
     }
 
+    // Takes the MapItemData, characters list, and objects list and inserts the characters and objects
+    //     in the right spaces in the game map
     fn set_map_grid(&mut self, map_item_data: Vec<MapItemData>, characters: HashMap<String, Character>,
                                                                 objects: HashMap< String, Object> ) {
         for map_item in map_item_data {
