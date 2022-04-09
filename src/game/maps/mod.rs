@@ -28,16 +28,3 @@ pub struct Size {
     pub height: i64,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct MapObject {
-    pub id: String,
-    pub position: Position,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Position {
-    pub x: usize,
-    pub y: usize,
-}

@@ -5,7 +5,7 @@ use yaml_rust::{YamlLoader,Yaml};
 use yaml_rust::Yaml::Hash;
 use serde_yaml::from_str;
 use crate::game::config_parsers::GameData;
-use crate::game::maps::{Map, MapObject, Size};
+use crate::game::maps::{Map, Size};
 use serde::{Serialize,Deserialize};
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -17,6 +17,20 @@ pub struct MapItemData {
     pub objects: Vec<MapObject>,
 }
 
+
+
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct MapObject {
+    pub id: String,
+    pub position: Position,
+}
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Position {
+    pub x: usize,
+    pub y: usize,
+}
 
 pub fn process_config_serde(map_item_data: &mut Vec<MapItemData>, config_path: &Path) -> Result<(),serde_yaml::Error>{
     let file_contents = fs::read_to_string(config_path).unwrap();
