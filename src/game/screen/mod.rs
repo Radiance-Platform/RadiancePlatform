@@ -482,10 +482,15 @@ impl Screen {
                 // Handle interacting with an object the player is over
                 // TODO: Handle player interactions
                 self.handle_interact_key(game_state, game_data);
-            } else if keycode == KeyCode::Char('E') {
+            } else if keycode == KeyCode::Char('E') || keycode == KeyCode::Char('e') {
                 // Handle opening the player's inventory
                 // TODO: Handle opening the player's inventory
-
+                game_state.visual_state = VisualState::PlayingInventory;
+                execute!(
+                        stdout(),
+                        MoveTo(10, 11),
+                        Print("Changing to Inventory")
+                    )?;
             }
 
             game_state.last_character_processed = true;
@@ -710,7 +715,74 @@ impl Screen {
     }
 
     // TODO: Implementation, documentation
-    fn draw_playing_inventory(&self, game_data: &GameData, game_state: &mut GameState) -> Result<()> {
+    fn draw_playing_inventory(&self, game_data: &mut GameData, game_state: &mut GameState) -> Result<()> {
+        // Dialog box width
+        let cols = self.current_columns;
+        let rows = self.current_rows;
+
+        // Draw dialog box border
+        self.draw_border(0, 0, cols, rows)?;
+
+        // Draw all the items in the inventory
+        let mut item_name_list = Vec::<String>::new();
+        item_name_list.push("Inventory:".to_string());
+        let inventory = &game_data.info.player.as_ref().unwrap().inventory;
+        for c in 0..inventory.len() {
+            for r in 0..inventory[c].len() {
+                if inventory[c][r].is_some() {
+                    item_name_list.push(inventory[c][r].as_ref().unwrap().name.clone());
+                }
+            }
+        }
+        let mut text_row = self.vertically_center_start_position(item_name_list.len() as u16);
+        for line in item_name_list {
+            execute!(
+                stdout(),
+                MoveTo(self.horizontally_center_start_position(&line), text_row),
+                Print(line),
+            )?;
+            text_row += 1;
+        }
+
+        // If the keypress has not been processed yet, process it.
+        if !game_state.last_character_processed {
+
+            // Get keypress
+            let keycode = match game_state.last_character_pressed.as_ref().unwrap() {
+                Event::Key(x) => {
+                    x.code
+                },
+                _ => { KeyCode::Null }
+            };
+
+            // Process keypresses
+            if keycode == KeyCode::Char('H') {
+                // Change to start screen
+                game_state.visual_state = VisualState::StartScreen;
+                execute!(
+                    stdout(),
+                    MoveTo(10, 11),
+                    Print("Changing to start screen")
+                )?;
+            } else if keycode == KeyCode::Char('m') || keycode == KeyCode::Esc {
+                // Change to map view
+                game_state.visual_state = VisualState::PlayingMap;
+                execute!(
+                        stdout(),
+                        MoveTo(10, 11),
+                        Print("Changing to map view")
+                    )?;
+            }
+
+            game_state.last_character_processed = true;
+            match self.draw(game_data, game_state) {
+                Ok(_) => {},
+                Err(_) => {
+                    println!("ERROR: Problem encountered while drawing screen, exiting!");
+                    self.end()?;
+                }
+            }
+        }
 
         Ok(())
     }
@@ -743,7 +815,7 @@ impl Screen {
                 self.draw_playing_dialog(game_data, game_state)?;
             },
             VisualState::PlayingInventory => {
-                self.draw_playing_dialog(game_data, game_state)?;
+                self.draw_playing_inventory(game_data, game_state)?;
             },
             VisualState::PlayingCharacterInteraction => {
                 self.draw_playing_character_interaction(game_data, game_state)?;
