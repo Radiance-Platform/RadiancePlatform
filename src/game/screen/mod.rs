@@ -112,6 +112,11 @@ impl Screen {
         return empty_space/2;
     }
 
+    fn horizontally_center_start_position_width(&self, s: &str, width: u16) -> u16 {
+        let empty_space = width - (s.len() as u16);
+        return empty_space/2;
+    }
+
     // Function to take in a number of lines and determine what row (line) they should start
     // being printed at in order to vertically center them.
     fn vertically_center_start_position(&self, c: u16) -> u16 {
@@ -577,10 +582,12 @@ impl Screen {
         let message = textwrap::wrap(&game_state.dialog_message, (width-4) as usize);
 
         // Draw the dialog message
+        let vertical_start = self.vertically_center_start_position(message.len() as u16);
         for i in 0..message.len() {
             execute!(
                 stdout(),
-                MoveTo((cols-width)/2+2, (rows-height)/2+1+i as u16),
+                //MoveTo((cols-width)/2+2, (rows-height)/2+1+i as u16),
+                MoveTo(self.horizontally_center_start_position(&message[i]), vertical_start + i as u16 - 1),
                 Print(&message[i]),
             )?;
         }
@@ -606,11 +613,15 @@ impl Screen {
 
         // Display button text
         // TODO: Proper centering of the text
+        let center_0 = (cols-width)/2 +
+                            self.horizontally_center_start_position_width(&game_state.dialog_option_0, width/2);
+        let center_1 = cols/2 +
+                            self.horizontally_center_start_position_width(&game_state.dialog_option_1, width/2);
         execute!(
             stdout(),
-            MoveTo(27, (rows-height)/2+height-button_height+1),
+            MoveTo(center_0, (rows-height)/2+height-button_height+1),
             Print(&game_state.dialog_option_0),
-            MoveTo(49, (rows-height)/2+height-button_height+1),
+            MoveTo(center_1, (rows-height)/2+height-button_height+1),
             Print(&game_state.dialog_option_1),
         )?;
 
