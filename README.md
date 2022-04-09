@@ -2,7 +2,10 @@
 A simple text-based game framework
 
 # Running
-From within the main folder (the one this README is in), run `cargo run -- --config-path example_game/`. Press C to exit.
+
+First, ensure you have a working Rust installation with cargo. See https://www.rust-lang.org/tools/install
+
+Then, from within the main folder (the one this README is in), run `cargo run -- --config-path example_game/` compile and start the game engine using the provided example game configuration files. Press the escape key to exit.
 
 # Notes / Useful Resources Used
 https://doc.rust-lang.org/book/

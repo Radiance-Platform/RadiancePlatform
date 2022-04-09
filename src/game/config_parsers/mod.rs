@@ -35,6 +35,7 @@ pub struct GameData {
 }
 
 impl GameData {
+    // Main function to initialize the game data object and populate it with data from the config files
     pub fn process_configs(config_path: std::path::PathBuf) -> GameData {
         println!("Parsing configs");
 
@@ -58,14 +59,13 @@ impl GameData {
         return game_data;
     }
 
+    // Scans the provided configuration path and calls the type-specific configuration parsers on each file
     fn scan_config(&mut self, config_path: std::path::PathBuf) {
 
         // As the configs are read, everything is thrown in these vectors, then after all are read, they get put into the actual map objects
         let mut characters = HashMap::<String, Character>::new();
         let mut objects = HashMap::<String, Object>::new();
         let mut map_item_data = Vec::<MapItemData>::new();
-
-        // TODO: Ensure that the maps are read last so that objects/characters can then be stored in the map
 
         // Loop over every file in the provided folder
         for entry in WalkDir::new(config_path).into_iter() // Iterator used to walk directory
@@ -75,9 +75,6 @@ impl GameData {
                 .map(|ext| ext == OsStr::new("yaml")) // and that the extension is yaml
                 .unwrap_or(false )// include this path in the processed paths if it passed, else don't
             ) {
-
-            //println!("{:?}", entry);
-            //println!("{:?}", entry.path().file_name());
 
             if entry.path().file_name() == Some(OsStr::new("game.yaml")) {
                 game::process_config(self, entry.path());
@@ -103,6 +100,7 @@ impl GameData {
         self.set_map_grid(map_item_data, characters, objects);
     }
 
+    // This function populates the map data structures with information gathered from the characters and object files
     fn set_map_grid(&mut self, map_item_data: Vec<MapItemData>, characters: HashMap<String, Character>,
                                                                 objects: HashMap< String, Object> ) {
         for map_item in map_item_data {

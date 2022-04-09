@@ -42,7 +42,7 @@ pub struct Screen {
 impl Screen {
 
     // Throw an error if the terminal size is too small to run the game
-    //      (Terminal must be 80x20)
+    //      (Terminal must be at least 80x20)
     fn check_screen_size() -> Result<()> {
         let error_terminal_too_small = Error::new(ErrorKind::Other, "Terminal size is too small, must be at least 80x20");
         let (cols, rows) = size()?;
@@ -115,6 +115,7 @@ impl Screen {
         return empty_space/2;
     }
 
+    // TODO: Merge with previous function
     fn horizontally_center_start_position_width(&self, s: &str, width: u16) -> u16 {
         let empty_space = width - (s.len() as u16);
         return empty_space/2;
@@ -262,6 +263,7 @@ impl Screen {
         }
     }
 
+    // Draws a rectangular border with given start coordinates and width/heights
     fn draw_border(&self, start_col: u16, start_row: u16, cols: u16, rows: u16) -> Result<()> {
         // Loop over each row
         for r in start_row..start_row+rows {

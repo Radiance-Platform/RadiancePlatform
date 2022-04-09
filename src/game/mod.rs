@@ -51,7 +51,7 @@ impl Game {
         return Game{game_data, game_state, screen};
     }
 
-    /// Start playing the game
+    /// Start playing the game by drawing the first screen, then running the main game loop
     pub fn start(&mut self) {
 
         println!("Starting game");
@@ -67,17 +67,20 @@ impl Game {
     }
 
     /// Main Game Loop
+    /// This gets called recursively to keep the game time moving forward
+    /// This function primarily handles reading in user input, handling screen refreshes, and
+    /// shutting the game down when requested.
     fn run(&mut self) {
 
-        // Blocking read
-        //self.game_state.last_character_pressed = read();
-
+        // Read input, but timeout after 500ms if no input is received.
+        // This timeout allows the game to continue processing things like screen updates without
+        // needing to rely on user input.
         if crossterm::event::poll(std::time::Duration::from_millis(500)).expect("Error") {
             self.game_state.last_character_pressed = crossterm::event::read();
             self.game_state.last_character_processed = false;
         }
 
-
+        // Redraw the screen
         match self.screen.draw(&mut self.game_data, &mut self.game_state) {
             Ok(_) => {},
             Err(_) => {
@@ -86,6 +89,7 @@ impl Game {
             }
         }
 
+        // Check if an exit was requested
         if self.game_state.do_exit {
             self.end();
         } else {
@@ -93,6 +97,7 @@ impl Game {
         }
     }
 
+    // Shut down the screen properly, and exit the program
     fn end(&self) {
         let _ = self.screen.end();
         exit(0);
@@ -120,14 +125,15 @@ pub struct GameState {
 }
 
 impl GameState {
+    // Converts a map ID into an actual map object index
+    // TODO: Move to maps module
     pub fn map_from_id(game_data: &GameData, map_id: &String) -> usize {
-        // Find the map that has an ID matching the provided map_id string
+        // Find the map that has an ID matching the provided map_id string by searching all maps
         for i in 0..game_data.maps.len() {
             if game_data.maps[i].info.id == map_id.to_string() {
                 return i;
             }
         }
         panic!("Failed to locate map by ID");
-
     }
 }
