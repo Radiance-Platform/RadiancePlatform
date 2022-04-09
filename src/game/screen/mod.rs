@@ -9,17 +9,15 @@ use crossterm::{
     execute,
     style::{Print},
     ExecutableCommand, Result,
-    terminal::{ScrollUp, SetSize, size},
+    terminal::{SetSize, size},
     cursor::{MoveTo}
 };
 use crossterm::cursor::{Hide, Show};
-use crossterm::event::{Event, KeyCode, KeyModifiers};
+use crossterm::event::{Event, KeyCode};
 use crossterm::terminal::{disable_raw_mode, enable_raw_mode, Clear, ClearType};
-//use crate::game::maps::MapData{Character, Object};
 use crate::game::maps::MapData;
 use crate::game::characters::Character;
 use super::objects::{ObjectInteraction, Object};
-//use crate::game::objects::Object;
 
 #[derive(Clone, Debug)]
 pub enum VisualState {
@@ -80,7 +78,15 @@ impl Screen {
 
         // Turn off the cursor
         // TODO: Make a match error check like those other ones
-        stdout().execute(Hide);
+        match stdout().execute(Hide) {
+            Err(_) => {
+                println!("ERROR: Unable to hide the terminal cursor, please try another terminal");
+                exit(1);
+            },
+            _ => {
+                println!("Terminal cursor hidden");
+            }
+        };
 
         // Turn on raw mode for proper keyboard input access
         match enable_raw_mode() {

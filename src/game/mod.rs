@@ -1,10 +1,7 @@
 use std::process::exit;
-use std::time::Duration;
 use config_parsers::GameData;
 use crate::game::screen::{Screen, VisualState};
-
-use crossterm::{event::{read, DisableMouseCapture, EnableMouseCapture, Event, KeyCode}, execute, terminal::{disable_raw_mode, enable_raw_mode}, Result, event};
-use crate::game::maps::Map;
+use crossterm::{event::{Event, KeyCode}, Result};
 
 pub mod characters;
 pub mod maps;

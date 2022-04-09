@@ -4,15 +4,13 @@ use std::path::Path;
 use std::collections::HashMap;
 use yaml_rust::YamlLoader;
 use yaml_rust::Yaml;
-use crate::game::config_parsers::GameData;
-use crate::game::objects::{Object, ObjectData, ObjectState,
+use crate::game::objects::{Object, ObjectState,
                            ObjectInteraction, ObjectInteractionActivate,
                            ObjectInteractionObjectUse};
 
 // Takes an object config file and loads it into an object, then adds that object to the objects list
 //      so that it can later be added to the game map.
-pub fn process_config(game_data: &mut GameData,
-                      objects: &mut HashMap<String, Object>, config_path: &Path) -> Result<(), Box<dyn Error>> {
+pub fn process_config(objects: &mut HashMap<String, Object>, config_path: &Path) -> Result<(), Box<dyn Error>> {
 
     // Load file contents
     let file_contents = fs::read_to_string(config_path)?;
@@ -21,9 +19,6 @@ pub fn process_config(game_data: &mut GameData,
     let docs = YamlLoader::load_from_str(&*file_contents).unwrap();
     // Multi document support, doc is a yaml::Yaml, need to extract the doc
     let doc = &docs[0];
-
-    // Debug print
-    //println!("{:?}", doc);
 
     let mut object = Object{
         id: "".to_string(),
@@ -187,21 +182,3 @@ fn parse_object_states(object: &mut Object, yaml_states: &Vec<Yaml>) {
         object.state.push(state);
     }
 }
-
-/*
-// Todo: Generalize the struct and manually handle extraneous data
-pub fn process_config_serde(game_data: &mut GameData,
-                            objects: &mut HashMap<String, Object>, config_path: &Path) -> Result<(),serde_yaml::Error>{
-    let file_contents = fs::read_to_string(config_path).unwrap();
-    let doc = serde_yaml::from_str::<ObjectData>(&file_contents);
-    match doc{
-        Ok(parsed) =>{
-            println!("Object Data Parsed\n{:?}",parsed);
-        }
-        Err(err) =>{
-            println!("{}",err);
-        }
-    }
-    Ok(())
-}
-*/

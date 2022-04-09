@@ -1,11 +1,6 @@
-use std::error::Error;
 use std::fs;
 use std::path::Path;
-use yaml_rust::{YamlLoader,Yaml};
-use yaml_rust::Yaml::Hash;
-use serde_yaml::from_str;
-use crate::game::config_parsers::GameData;
-use crate::game::maps::{Map, Size};
+use crate::game::maps::{Size};
 use serde::{Serialize,Deserialize};
 
 #[derive(Debug, Serialize, Deserialize)]

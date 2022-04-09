@@ -1,19 +1,15 @@
-use std::error::Error;
 use std::collections::HashMap;
 use std::fs;
 use std::path::Path;
-use yaml_rust::YamlLoader;
 use serde::{Serialize,Deserialize};
 use crate::game::characters::{Character};
 use crate::game::characters::role::Role;
-use crate::game::config_parsers::GameData;
 use crate::game::characters::attribute::Attribute;
 use crate::game::objects::Object;
 
 
 // Reads character config file into a temporary data structure using Serde
-pub fn process_config_serde(game_data: & mut GameData, 
-                            characters: &mut HashMap<String, Character>, config_path: &Path) -> Result<(), serde_yaml::Error>{
+pub fn process_config_serde(characters: &mut HashMap<String, Character>, config_path: &Path) -> Result<(), serde_yaml::Error>{
     let file_contents = fs::read_to_string(config_path).unwrap();
     let doc = serde_yaml::from_str::<CharacterData>(&file_contents);
     match doc {
@@ -28,7 +24,7 @@ pub fn process_config_serde(game_data: & mut GameData,
 }
 
 // Converts temporary data structure in to a Character structure and adds it to the characters list
-//      so that it can later be added to the game map.
+// so that it can later be added to the game map.
 fn get_character_from_data(characters: &mut HashMap<String, Character>, data: CharacterData) {
     let mut character = Character{
         name: "".to_string(),
@@ -45,7 +41,7 @@ fn get_character_from_data(characters: &mut HashMap<String, Character>, data: Ch
     character.icon = data.icon;
     //character.role = data.role;
     for attribute_data in data.traits {
-        let mut attribute = Attribute {
+        let attribute = Attribute {
             name: attribute_data.name,
             min_val: 0,
             max_val: attribute_data.max_value,

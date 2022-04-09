@@ -1,14 +1,12 @@
 use std::ffi::OsStr;
 use crate::game::maps::{Map, MapInfo};
-use std::path::{Component, Path};
-use std::path::Component::Normal;
 use walkdir::WalkDir;
 use crate::game::characters::Character;
 use crate::game::objects::Object;
 use crate::game::maps::MapData;
 use std::collections::HashMap;
+use std::error::Error;
 use crate::game::config_parsers::maps::MapItemData;
-
 
 mod characters;
 mod game;
@@ -54,13 +52,13 @@ impl GameData {
             }
         };
 
-        game_data.scan_config(config_path);
+        game_data.scan_config(config_path).expect("Error scanning configuration files, aborting!");
 
         return game_data;
     }
 
     // Scans the provided configuration path and calls the type-specific configuration parsers on each file
-    fn scan_config(&mut self, config_path: std::path::PathBuf) {
+    fn scan_config(&mut self, config_path: std::path::PathBuf) -> Result<(), Box<dyn Error>> {
 
         // As the configs are read, everything is thrown in these vectors, then after all are read, they get put into the actual map objects
         let mut characters = HashMap::<String, Character>::new();
@@ -77,7 +75,7 @@ impl GameData {
             ) {
 
             if entry.path().file_name() == Some(OsStr::new("game.yaml")) {
-                game::process_config(self, entry.path());
+                game::process_config(self, entry.path())?;
 
             } else {
                 let parent_opt = entry.path() // Option<> representing the parent's path, starting with current path
@@ -89,21 +87,23 @@ impl GameData {
                 if let Some(parent) = parent_opt {
                     // Then check it against our valid parents
                     match parent {
-                        "maps" => { maps::process_config_serde(&mut map_item_data, entry.path()); }
-                        "characters" => { characters::process_config_serde(self, &mut characters, entry.path()); }
-                        "objects" => { objects::process_config(self, &mut objects, entry.path()); }
+                        "maps" => { maps::process_config_serde(&mut map_item_data, entry.path())?; }
+                        "characters" => { characters::process_config_serde(&mut characters, entry.path())?; }
+                        "objects" => { objects::process_config(&mut objects, entry.path())?; }
                         _ => { println!("Found unknown file '{:?}', ignoring", entry.path()) }
                     }
                 }
             }
         }
-        self.set_map_grid(map_item_data, characters, objects);
+        self.set_map_grid(map_item_data, characters, objects)?;
+
+        Ok(())
     }
 
     // Takes the MapItemData, characters list, and objects list and inserts the characters and objects
     //     in the right spaces in the game map
     fn set_map_grid(&mut self, map_item_data: Vec<MapItemData>, characters: HashMap<String, Character>,
-                                                                objects: HashMap< String, Object> ) {
+                                                                objects: HashMap< String, Object> ) -> Result<(), Box<dyn Error>> {
         for map_item in map_item_data {
             // Apparently using size in the map definition moves size, so let's copy the values out ◔_◔
             let width = map_item.size.width;
@@ -140,6 +140,8 @@ impl GameData {
                 self.info.player = Option::<Character>::Some(characters.get("player").unwrap().to_owned());
             }
         }
+
+        Ok(())
 
     }
 

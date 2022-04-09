@@ -2,7 +2,7 @@ use std::error::Error;
 use std::fs;
 use std::path::Path;
 use yaml_rust::YamlLoader;
-use crate::game::config_parsers::{GameData, GameInfo};
+use crate::game::config_parsers::{GameData};
 
 // Reads game config file into the GameData structure
 pub fn process_config(game_data: &mut GameData, config_path: &Path) -> Result<(), Box<dyn Error>> {
