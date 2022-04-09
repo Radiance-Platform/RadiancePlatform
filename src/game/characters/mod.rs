@@ -22,6 +22,7 @@ impl Character {
             for r in 0..self.inventory[c].len() {
                 if self.inventory[c][r].is_none() {
                     self.inventory[c][r] = Option::Some::<Object>(object.to_owned());
+                    return;
                 }
             }
         }
