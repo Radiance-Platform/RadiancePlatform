@@ -32,6 +32,7 @@ pub struct Position {
     pub y: usize,
 }
 
+// Reads the map config file into a temporary structure (MapItemData) using Serde
 pub fn process_config_serde(map_item_data: &mut Vec<MapItemData>, config_path: &Path) -> Result<(),serde_yaml::Error>{
     let file_contents = fs::read_to_string(config_path).unwrap();
     let doc = serde_yaml::from_str::<MapItemData>(&file_contents);

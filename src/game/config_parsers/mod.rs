@@ -100,7 +100,8 @@ impl GameData {
         self.set_map_grid(map_item_data, characters, objects);
     }
 
-    // This function populates the map data structures with information gathered from the characters and object files
+    // Takes the MapItemData, characters list, and objects list and inserts the characters and objects
+    //     in the right spaces in the game map
     fn set_map_grid(&mut self, map_item_data: Vec<MapItemData>, characters: HashMap<String, Character>,
                                                                 objects: HashMap< String, Object> ) {
         for map_item in map_item_data {
