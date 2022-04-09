@@ -282,6 +282,7 @@ impl Screen {
         Ok(())
     }
 
+    // Draws the start screen with the game name, author, description, and instructions for how to play
     // TODO: Implementation, documentation
     fn draw_start_screen(&self, game_data: &mut GameData, game_state: &mut GameState) -> Result<()> {
         self.draw_border(0, 0, 80, 20)?;
@@ -355,6 +356,8 @@ impl Screen {
         Ok(())
     }
 
+    // Draws the playing map (main gameplay screen) and handles keypress input for moving the character,
+    //      item interaction, and changing screens.
     // TODO: Implementation, documentation
     fn draw_playing_map(&self, game_data: &mut GameData, game_state: &mut GameState) -> Result<()> {
 
@@ -507,6 +510,8 @@ impl Screen {
     }
 
 
+    // Returns true if there is space on the map for the player to move delta_x spaces right and delta_y spaces down.
+    // Returns false if there is an object in the way or the move is out of map bounds.
     fn check_move_available(&self, game_data: &GameData, game_state: &mut GameState, delta_x: i16, delta_y: i16) -> bool {
 
         let target_x = game_state.current_player_x as i16 + delta_x;
@@ -566,6 +571,8 @@ impl Screen {
 
 
 
+    // Draws a 50 x 12 dialog box with two buttons. Dialog and button text is specified in game_state.
+    // Handles key presses and button highlighting.
     // TODO: Implementation, documentation
     fn draw_playing_dialog(&self, game_data: &mut GameData, game_state: &mut GameState) -> Result<()> {
 
@@ -714,6 +721,8 @@ impl Screen {
         Ok(())
     }
 
+    // Draws inventory/stat screen.
+    // Handles key presses.
     // TODO: Implementation, documentation
     fn draw_playing_inventory(&self, game_data: &mut GameData, game_state: &mut GameState) -> Result<()> {
         // Dialog box width
@@ -799,6 +808,7 @@ impl Screen {
         Ok(())
     }
 
+    // Draws the screen specified by VisualState.
     // TODO: Documentation
     pub fn draw(&self, game_data: &mut GameData, game_state: &mut GameState) -> Result<()> {
 
@@ -829,6 +839,7 @@ impl Screen {
     }
 
 
+    // Cleans up terminal and displays shutdown message
     pub fn end(&self) -> Result<()> {
 
         self.reset()?;
