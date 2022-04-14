@@ -320,6 +320,36 @@ impl Screen {
         Ok(())
     }
 
+    fn draw_item_grid(&self, items: &Vec<Vec<Option<Object>>>, start_col: u16, start_row: u16) -> Result<()> {
+        let box_cols: u16 = 18;
+        let mut box_rows: u16 = 7;
+
+        for c in 0..items.len() {
+            for r in 0..items[c].len() {
+                // Draw the box for this array spot
+                let box_start_col = start_col + (c as u16)*(box_cols-1);
+                let box_start_row = start_row + (r as u16)*(box_rows-1);
+                if r == 2 { // Temorary fix to make the items fit perfectly in the box
+                    box_rows += 1;
+                }
+                self.draw_border(box_start_col, box_start_row, box_cols, box_rows)?;
+                if items[c][r].is_some() {
+                    let item = items[c][r].as_ref().unwrap();
+                    // display item name and icon
+                    stdout().execute(MoveTo(box_start_col+2, box_start_row+2))?;
+                    stdout().execute(Print(item.name.clone()))?;
+                    stdout().execute(MoveTo(box_start_col+2, box_start_row+3))?;
+                    stdout().execute(Print(item.icon))?;
+                }
+                if r == 2 { // Temorary fix to make the items fit perfectly in the box
+                    box_rows -= 1;
+                }
+            }
+        }
+
+        Ok(())
+    }
+
     // Draws the start screen with the game name, author, description, and instructions for how to play
     fn draw_start_screen(&self, game_data: &mut GameData, game_state: &mut GameState) -> Result<()> {
         self.draw_border(0, 0, 80, 20)?;
@@ -760,31 +790,15 @@ impl Screen {
         // Dialog box width
         let cols = self.current_columns;
         let rows = self.current_rows;
+        let grid_start_col: u16 = 28;
 
         // Draw dialog box border
         self.draw_border(0, 0, cols, rows)?;
-        self.draw_highlight_border(0, 0, cols, rows)?;
+        //self.draw_highlight_border(0, 0, cols, rows)?;
 
         // Draw all the items in the inventory
-        let mut item_name_list = Vec::<String>::new();
-        item_name_list.push("Inventory:".to_string());
         let inventory = &game_data.info.player.as_ref().unwrap().inventory;
-        for c in 0..inventory.len() {
-            for r in 0..inventory[c].len() {
-                if inventory[c][r].is_some() {
-                    item_name_list.push(inventory[c][r].as_ref().unwrap().name.clone());
-                }
-            }
-        }
-        let mut text_row = self.vertically_center_start_position(item_name_list.len() as u16);
-        for line in item_name_list {
-            execute!(
-                stdout(),
-                MoveTo(self.horizontally_center_start_position(&line), text_row),
-                Print(line),
-            )?;
-            text_row += 1;
-        }
+        self.draw_item_grid(inventory, grid_start_col, 0)?;
 
         // If the keypress has not been processed yet, process it.
         if !game_state.last_character_processed {
@@ -806,7 +820,9 @@ impl Screen {
                     MoveTo(10, 11),
                     Print("Changing to start screen")
                 )?;
-            } else if keycode == KeyCode::Char('m') || keycode == KeyCode::Esc {
+            } else if keycode == KeyCode::Char('m')
+                   || keycode == KeyCode::Esc
+                   || keycode == KeyCode::Char('e') {
                 // Change to map view
                 game_state.visual_state = VisualState::PlayingMap;
                 execute!(
