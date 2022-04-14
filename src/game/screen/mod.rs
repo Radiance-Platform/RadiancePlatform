@@ -252,7 +252,6 @@ impl Screen {
                     if object_use.foreign_object_id != inventory_object.id {
                         return;
                     }
-                    // TODO: fix keys only unlocking one side of the door
                     for action in &object_use.self_action {
                         // Perform all self-actions
                         let mut new_map_object = map_object.clone();
@@ -260,6 +259,22 @@ impl Screen {
                         game_data.maps[game_state.current_map]
                                 .grid[game_state.current_player_x as usize][game_state.current_player_y as usize]
                                 = Option::<MapData>::Some(MapData::Object(new_map_object));
+                    }
+                    // If the item is a door, perform all the actions on the other side of the door.
+                    if map_object.category == "door" {
+                        // Get position of other door
+                        let (mut door_map, mut door_x, mut door_y) = (0, 0, 0);
+                        self.get_door_other_side(game_state, game_data, map_object.id.clone(),
+                                                 &mut door_map, &mut door_x, &mut door_y);
+                        // Perform actions on other door
+                        for action in &object_use.self_action {
+                            // Perform all self-actions
+                            let mut new_door = map_object.clone();
+                            new_door.set_state(action.name.clone(), action.value);
+                            game_data.maps[door_map]
+                                    .grid[door_x as usize][door_y as usize]
+                                    = Option::<MapData>::Some(MapData::Object(new_door));
+                        }
                     }
                     // If the item is consumed, remove it from the inventory
                     if object_use.consume_item {
@@ -292,6 +307,21 @@ impl Screen {
     // Assume prereqs are already checked.
     fn travel_through_door(&self, game_state: &mut GameState, game_data: &GameData, door: &Object) {
         // find door
+        let (mut m, mut x, mut y) = (0, 0, 0);
+        self.get_door_other_side(game_state, game_data, door.id.clone(),
+                                &mut m, &mut x, &mut y);
+        // Move character to new door
+        game_state.current_map = m;
+        game_state.current_player_x = x as u16;
+        game_state.current_player_y = y as u16;
+    }
+
+    // Sets door_map, x, and y to the position of the door with door_id that is not in current space.
+    fn get_door_other_side(&self, game_state: &GameState, game_data: &GameData, door_id: String,
+                           door_map: &mut usize, x: &mut usize, y: &mut usize) {
+        *door_map = 0;
+        *x = 0;
+        *y = 0;
         // Go through each map
         for m in 0..game_data.maps.len() {
             let map = &game_data.maps[m];
@@ -308,11 +338,11 @@ impl Screen {
                             MapData::Character(_character) => {
                             }
                             MapData::Object(object) => {
-                                if object.id == door.id { // If correct door is found
+                                if object.id == door_id { // If correct door is found
                                     // Move character to new door
-                                    game_state.current_map = m;
-                                    game_state.current_player_x = c as u16;
-                                    game_state.current_player_y = r as u16;
+                                    *door_map = m;
+                                    *x = c;
+                                    *y = r;
                                     return;
                                 }
                             }
