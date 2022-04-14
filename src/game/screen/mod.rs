@@ -320,7 +320,8 @@ impl Screen {
         Ok(())
     }
 
-    fn draw_item_grid(&self, items: &Vec<Vec<Option<Object>>>, start_col: u16, start_row: u16) -> Result<()> {
+    fn draw_item_grid(&self, items: &Vec<Vec<Option<Object>>>, start_col: u16, start_row: u16,
+                      selected_col: usize, selected_row: usize) -> Result<()> {
         let box_cols: u16 = 18;
         let mut box_rows: u16 = 7;
 
@@ -332,7 +333,11 @@ impl Screen {
                 if r == 2 { // Temorary fix to make the items fit perfectly in the box
                     box_rows += 1;
                 }
-                self.draw_border(box_start_col, box_start_row, box_cols, box_rows)?;
+                if selected_col == c && selected_row == r {
+                    self.draw_highlight_border(box_start_col, box_start_row, box_cols, box_rows)?;
+                } else {
+                    self.draw_border(box_start_col, box_start_row, box_cols, box_rows)?;
+                }
                 if items[c][r].is_some() {
                     let item = items[c][r].as_ref().unwrap();
                     // display item name and icon
@@ -798,7 +803,15 @@ impl Screen {
 
         // Draw all the items in the inventory
         let inventory = &game_data.info.player.as_ref().unwrap().inventory;
-        self.draw_item_grid(inventory, grid_start_col, 0)?;
+        self.draw_item_grid(inventory, grid_start_col, 0, game_state.inventory_x, game_state.inventory_y)?;
+
+        let inventory_width = inventory.len();
+        let inventory_height;
+        if inventory_width > 0 {
+            inventory_height = inventory[0].len();
+        } else {
+            inventory_height = 0;
+        }
 
         // If the keypress has not been processed yet, process it.
         if !game_state.last_character_processed {
@@ -811,7 +824,32 @@ impl Screen {
                 _ => { KeyCode::Null }
             };
 
-            // Process keypresses
+            // Process keypresses for selecting items
+            if keycode == KeyCode::Left {
+                if game_state.inventory_x == 0 {
+                    game_state.inventory_x = inventory_width - 1
+                } else {
+                    game_state.inventory_x = game_state.inventory_x - 1;
+                }
+
+            } else if keycode == KeyCode::Right {
+                game_state.inventory_x = (game_state.inventory_x + 1) % inventory_width;
+
+            } else if keycode == KeyCode::Up {
+                if game_state.inventory_y == 0 {
+                    game_state.inventory_y = inventory_height - 1
+                } else {
+                    game_state.inventory_y = game_state.inventory_y - 1;
+                }
+
+            } else if keycode == KeyCode::Down {
+                game_state.inventory_y = (game_state.inventory_y + 1) % inventory_height;
+
+            } else if keycode == KeyCode::Enter {
+                // TODO: use selected item
+            }
+
+            // Process keypresses for changing screens
             if keycode == KeyCode::Char('H') {
                 // Change to start screen
                 game_state.visual_state = VisualState::StartScreen;
