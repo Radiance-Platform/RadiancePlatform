@@ -116,21 +116,15 @@ impl Screen {
 
     // Function to take in a string and determine what column it should start being printed at
     // in order to horizontally center it. `s` should be the string to center.
-    fn horizontally_center_start_position(&self, s: &str) -> u16 {
-        let empty_space = self.current_columns - (s.len() as u16);
-        return empty_space/2;
-    }
-
-    // TODO: Merge with previous function
-    fn horizontally_center_start_position_width(&self, s: &str, width: u16) -> u16 {
-        let empty_space = width - (s.len() as u16);
+    fn horizontally_center_start_position(&self, s: &str, container_cols: u16) -> u16 {
+        let empty_space = container_cols - (s.len() as u16);
         return empty_space/2;
     }
 
     // Function to take in a number of lines and determine what row (line) they should start
     // being printed at in order to vertically center them.
-    fn vertically_center_start_position(&self, c: u16) -> u16 {
-        let empty_space = self.current_rows - c;
+    fn vertically_center_start_position(&self, c: u16, container_rows: u16) -> u16 {
+        let empty_space = container_rows - c;
         return empty_space/2;
     }
 
@@ -330,7 +324,7 @@ impl Screen {
                 // Draw the box for this array spot
                 let box_start_col = start_col + (c as u16)*(box_cols-1);
                 let box_start_row = start_row + (r as u16)*(box_rows-1);
-                if r == 2 { // Temorary fix to make the items fit perfectly in the box
+                if r == 2 { // Temporary fix to make the items fit perfectly in the screen
                     box_rows += 1;
                 }
                 if selected_col == c && selected_row == r {
@@ -341,12 +335,27 @@ impl Screen {
                 if items[c][r].is_some() {
                     let item = items[c][r].as_ref().unwrap();
                     // display item name and icon
-                    stdout().execute(MoveTo(box_start_col+2, box_start_row+2))?;
-                    stdout().execute(Print(item.name.clone()))?;
-                    stdout().execute(MoveTo(box_start_col+2, box_start_row+3))?;
-                    stdout().execute(Print(item.icon))?;
+                    let name = item.name.clone();
+                    let icon = item.icon;
+                    let name_start_col = box_start_col
+                                              + self.horizontally_center_start_position(&name, box_cols);
+                    let icon_start_col = box_start_col
+                                              + self.horizontally_center_start_position("i", box_cols);
+                    let icon_start_row = box_start_row
+                                              + self.vertically_center_start_position(1, box_rows);
+                    stdout().execute(MoveTo(name_start_col, box_start_row+2))?;
+                    stdout().execute(Print(name))?;
+                    stdout().execute(MoveTo(icon_start_col, icon_start_row))?;
+                    stdout().execute(Print(icon))?;
+
+                    let use_start_col = box_start_col
+                                            + self.horizontally_center_start_position("Use?", box_cols);
+                    if r == selected_row && c == selected_col {
+                        stdout().execute(MoveTo(use_start_col, box_start_row + box_rows - 2))?;
+                        stdout().execute(Print("Use?"))?;
+                    }
                 }
-                if r == 2 { // Temorary fix to make the items fit perfectly in the box
+                if r == 2 { // Temporary fix to make the items fit perfectly in the screen
                     box_rows -= 1;
                 }
             }
@@ -384,11 +393,11 @@ impl Screen {
         lines.push("");
         lines.push("Press Enter to start the game.");
 
-        let mut row = self.vertically_center_start_position(lines.len() as u16);
+        let mut row = self.vertically_center_start_position(lines.len() as u16, self.current_rows);
         for line in lines {
             execute!(
                 stdout(),
-                MoveTo(self.horizontally_center_start_position(line), row),
+                MoveTo(self.horizontally_center_start_position(line, self.current_columns), row),
                 Print(line),
             )?;
             row += 1;
@@ -662,12 +671,12 @@ impl Screen {
         let message = textwrap::wrap(&game_state.dialog_message, (width-4) as usize);
 
         // Draw the dialog message
-        let vertical_start = self.vertically_center_start_position(message.len() as u16);
+        let vertical_start = self.vertically_center_start_position(message.len() as u16, self.current_rows);
         for i in 0..message.len() {
             execute!(
                 stdout(),
                 //MoveTo((cols-width)/2+2, (rows-height)/2+1+i as u16),
-                MoveTo(self.horizontally_center_start_position(&message[i]), vertical_start + i as u16 - 1),
+                MoveTo(self.horizontally_center_start_position(&message[i], self.current_columns), vertical_start + i as u16 - 1),
                 Print(&message[i]),
             )?;
         }
@@ -693,9 +702,9 @@ impl Screen {
 
         // Display button text
         let center_0 = (cols-width)/2 +
-                            self.horizontally_center_start_position_width(&game_state.dialog_option_0, width/2);
+                            self.horizontally_center_start_position(&game_state.dialog_option_0, width/2);
         let center_1 = cols/2 +
-                            self.horizontally_center_start_position_width(&game_state.dialog_option_1, width/2);
+                            self.horizontally_center_start_position(&game_state.dialog_option_1, width/2);
         execute!(
             stdout(),
             MoveTo(center_0, (rows-height)/2+height-button_height+1),
