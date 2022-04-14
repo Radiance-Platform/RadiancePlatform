@@ -17,6 +17,7 @@ use crossterm::event::{Event, KeyCode};
 use crossterm::terminal::{disable_raw_mode, enable_raw_mode, Clear, ClearType};
 use crate::game::maps::MapData;
 use crate::game::characters::Character;
+use super::maps::Map;
 use super::objects::{ObjectInteraction, Object};
 
 #[derive(Clone, Debug)]
@@ -212,6 +213,65 @@ impl Screen {
                 }
             }
         }
+    }
+
+    // Uses the object currently selected in the inventory on the object currently under the player.
+    // TODO: Display some dialog if the object can't be used in this way for any reason.
+    fn use_object(&self, game_state: &mut GameState, game_data: &mut GameData) {
+        let x = game_state.current_player_x as usize;
+        let y = game_state.current_player_y as usize;
+        let i_x = game_state.inventory_x;
+        let i_y = game_state.inventory_y;
+
+        // Get the object on the map to use the item on
+        let map_object;
+        let map = game_data.maps[game_state.current_map].clone();
+        if map.grid[x][y].is_some() {
+            match map.grid[x][y].as_ref().unwrap()  {
+                MapData::Character(_character) => { return; /* No object. Do nothing*/ }
+                MapData::Object(object) => { map_object = object; }
+            }
+        } else {
+            return; // Nothing to use the object on. Do nothing.
+        }
+
+        // Get the selected inventory object
+        let inventory_object;
+        let inventory = game_data.info.player.as_ref().unwrap().inventory.clone();
+        if inventory[i_x][i_y].is_some() {
+            inventory_object = inventory[i_x][i_y].as_ref().unwrap();
+        } else {
+            return; // Nothing in inventory slot. This shouldn't really happen at this point.
+        }
+
+        // find object use interaction
+        for interaction in &map_object.interactions {
+            match interaction {
+                ObjectInteraction::ObjectInteractionActivate(_activate) => {}
+                ObjectInteraction::ObjectInteractionObjectUse(object_use) => {
+                    if object_use.foreign_object_id != inventory_object.id {
+                        return;
+                    }
+                    // TODO: fix keys only unlocking one side of the door
+                    for action in &object_use.self_action {
+                        // Perform all self-actions
+                        let mut new_map_object = map_object.clone();
+                        new_map_object.set_state(action.name.clone(), action.value);
+                        game_data.maps[game_state.current_map]
+                                .grid[game_state.current_player_x as usize][game_state.current_player_y as usize]
+                                = Option::<MapData>::Some(MapData::Object(new_map_object));
+                    }
+                    // If the item is consumed, remove it from the inventory
+                    if object_use.consume_item {
+                        let mut new_player = game_data.info.player.as_ref().unwrap().clone();
+                        new_player.inventory[i_x][i_y] = Option::None;
+                        game_data.info.player = Option::<Character>::Some(new_player);
+                    }
+                }
+            }
+        }
+
+        return;
     }
 
     fn collect_object(&self, game_state: &mut GameState, game_data: &mut GameData, object: &Object) {
@@ -856,6 +916,7 @@ impl Screen {
 
             } else if keycode == KeyCode::Enter {
                 // TODO: use selected item
+                self.use_object(game_state, game_data);
             }
 
             // Process keypresses for changing screens

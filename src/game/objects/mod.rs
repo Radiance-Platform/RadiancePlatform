@@ -77,6 +77,16 @@ impl Object {
         }
         return false;
     }
+
+    // Sets state with state_name to state_val.
+    //    If state_name does not exist, does nothing.
+    pub fn set_state(&mut self, state_name: String, state_val: bool) {
+        for s in &mut self.state {
+            if s.name.eq(&state_name) {
+                s.value = state_val;
+            }
+        }
+    }
 }
 
 #[derive(Debug, Serialize, Deserialize)]

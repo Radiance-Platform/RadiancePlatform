@@ -16,5 +16,4 @@ interactions:
     - foreign_objects_id: "key"
       self_action:
         - unlocked: true
-      other_action:
-        consume_item: true
+      consume_item: true
