@@ -295,6 +295,31 @@ impl Screen {
         Ok(())
     }
 
+    // Draws a rectangular border with given start coordinates and width/heights.
+    // Adds a highlight ('=' signs around the inside of the border) to indicate the box is selected.
+    fn draw_highlight_border(&self, start_col: u16, start_row: u16, cols: u16, rows: u16) -> Result<()> {
+        self.draw_border(start_col, start_row, cols, rows)?;
+        // Loop over each row
+        let h_start_col = start_col+1;
+        let h_start_row = start_row+1;
+        let h_cols = cols-2;
+        let h_rows = rows-2;
+        for r in h_start_row..h_start_row+h_rows {
+            // Loop over each column
+            stdout().execute(MoveTo(h_start_col, r))?;
+            for c in h_start_col..h_start_col+h_cols {
+                if r == h_start_row || r == h_start_row+h_rows-1 ||
+                   c == h_start_col || c == h_start_col+h_cols-1 {
+                    stdout().execute(Print("="))?;
+                } else {
+                    stdout().execute(Print(" "))?;
+                }
+            }
+        }
+
+        Ok(())
+    }
+
     // Draws the start screen with the game name, author, description, and instructions for how to play
     fn draw_start_screen(&self, game_data: &mut GameData, game_state: &mut GameState) -> Result<()> {
         self.draw_border(0, 0, 80, 20)?;
@@ -738,6 +763,7 @@ impl Screen {
 
         // Draw dialog box border
         self.draw_border(0, 0, cols, rows)?;
+        self.draw_highlight_border(0, 0, cols, rows)?;
 
         // Draw all the items in the inventory
         let mut item_name_list = Vec::<String>::new();
