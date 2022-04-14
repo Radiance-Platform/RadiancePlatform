@@ -17,6 +17,7 @@ use crossterm::event::{Event, KeyCode};
 use crossterm::terminal::{disable_raw_mode, enable_raw_mode, Clear, ClearType};
 use crate::game::maps::MapData;
 use crate::game::characters::Character;
+use crate::game::characters::attribute;
 use super::maps::Map;
 use super::objects::{ObjectInteraction, Object};
 
@@ -450,6 +451,46 @@ impl Screen {
                 }
             }
         }
+
+        Ok(())
+    }
+
+    // Draw stats (attributes) in a list with the top right corner at (start_col, start_row).
+    //    Stats are in format: <stat name>: <current_value>/<max_value>
+    fn draw_stat_display(&self, stats: &Vec<attribute::Attribute>, start_col: u16, start_row: u16) -> Result<()> {
+        let mut row = 0;
+        for stat in stats {
+            // TODO: Figure out stat bar formatting
+            let line = format!("{}: {}/{}", stat.display_name, stat.current_val, stat.max_val);
+            execute!(
+                stdout(),
+                MoveTo(start_col, start_row + row),
+                Print(line),
+            )?;
+            row += 1;
+        }
+
+        Ok(())
+    }
+
+    fn draw_face(&self, start_col: u16, start_row: u16, character: &Character) -> Result<()> {
+        let cols = 18;
+        let rows = 7;
+        self.draw_border(start_col, start_row, cols, rows)?;
+        if character.name == "player" {
+
+        }
+        execute!(
+            stdout(),
+            MoveTo(start_col+5, start_row + 1),
+            Print(".       ."),
+            MoveTo(start_col+3, start_row + 4),
+            Print("|          |"),
+            MoveTo(start_col+3, start_row + 5),
+            Print("+----------+"),
+            MoveTo(start_col + self.horizontally_center_start_position(&character.name, cols), start_row+rows+1),
+            Print(&character.name),
+        )?;
 
         Ok(())
     }
@@ -889,7 +930,6 @@ impl Screen {
 
     // Draws inventory/stat screen.
     // Handles key presses.
-    // TODO: Improve layout
     fn draw_playing_inventory(&self, game_data: &mut GameData, game_state: &mut GameState) -> Result<()> {
         // Dialog box width
         let cols = self.current_columns;
@@ -898,7 +938,13 @@ impl Screen {
 
         // Draw dialog box border
         self.draw_border(0, 0, cols, rows)?;
-        //self.draw_highlight_border(0, 0, cols, rows)?;
+
+        // Draw player face
+        self.draw_face(5, 2, game_data.info.player.as_ref().unwrap())?;
+
+        // Draw player stats
+        let player_stats = &game_data.info.player.as_ref().unwrap().attributes;
+        self.draw_stat_display(player_stats, 2, (rows*2)/3)?;
 
         // Draw all the items in the inventory
         let inventory = &game_data.info.player.as_ref().unwrap().inventory;

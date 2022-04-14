@@ -27,6 +27,7 @@ pub fn process_config_serde(characters: &mut HashMap<String, Character>, config_
 // so that it can later be added to the game map.
 fn get_character_from_data(characters: &mut HashMap<String, Character>, data: CharacterData) {
     let mut character = Character{
+        id: "".to_string(),
         name: "".to_string(),
         role: Role { role: "".to_string() },
         attributes: vec![],
@@ -37,19 +38,21 @@ fn get_character_from_data(characters: &mut HashMap<String, Character>, data: Ch
     for i in 0..(data.inventory_size.width) {
         character.inventory[i as usize].resize(data.inventory_size.height as usize, Option::<Object>::None);
     }
-    character.name = data.id;
+    character.id = data.id;
+    character.name = data.name;
     character.icon = data.icon;
     //character.role = data.role;
     for attribute_data in data.traits {
         let attribute = Attribute {
             name: attribute_data.name,
+            display_name: attribute_data.display_name,
             min_val: 0,
             max_val: attribute_data.max_value,
             current_val: attribute_data.starting_value
         };
         character.attributes.push(attribute);
     }
-    characters.insert(character.name.clone(), character);
+    characters.insert(character.id.clone(), character);
 }
 
 // Temporary data structure CharacterData is used for Serde parsing and nothing else.

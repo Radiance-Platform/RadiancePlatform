@@ -9,6 +9,7 @@ pub mod attribute;
 
 #[derive(Clone, Debug)]
 pub struct Character {
+    pub id: String,
     pub name: String,
     pub role: Role,
     pub attributes: Vec<Attribute>,
