@@ -157,7 +157,8 @@ impl Screen {
         game_state.dialog_message = "Would you like to exit the game?".to_string();
         game_state.dialog_option_0 = "No".to_string();
         game_state.dialog_option_1 = "Yes".to_string();
-        game_state.dialog_return_to = game_state.visual_state.clone();
+        game_state.dialog_return_0 = game_state.visual_state.clone();
+        game_state.dialog_return_cancel = game_state.visual_state.clone();
         game_state.visual_state = VisualState::PlayingDialog;
         game_state.pre_exit = true;
     }
@@ -190,10 +191,11 @@ impl Screen {
                                                     , object.name);
                 game_state.dialog_option_0 = "Open inventory".to_string();
                 game_state.dialog_option_1 = "Close".to_string();
-                game_state.dialog_return_to = game_state.visual_state.clone();
+                game_state.dialog_return_0 = VisualState::PlayingInventory;
+                game_state.dialog_return_1 = game_state.visual_state.clone();
+                game_state.dialog_return_cancel = game_state.visual_state.clone();
                 game_state.pre_exit = false;
                 game_state.visual_state = VisualState::PlayingDialog;
-                // TODO: Have selecting "Open inventory" in the dialog draw the inventory screen.  
                 return;
             }
             _ => {
@@ -872,14 +874,18 @@ impl Screen {
                 if game_state.pre_exit {
                     if game_state.dialog_selected == 1 {
                         game_state.do_exit = true;
-                    } else {
+                    } else { // If dialog_selected == 0
                         game_state.pre_exit = false;
-                        game_state.visual_state = game_state.dialog_return_to.clone();
+                        game_state.visual_state = game_state.dialog_return_0.clone();
                     }
                 } else {
                     // Set up the result and return to the previous screen
                     game_state.dialog_result_ready = true;
-                    game_state.visual_state = game_state.dialog_return_to.clone();
+                    if game_state.dialog_selected == 0 {
+                        game_state.visual_state = game_state.dialog_return_0.clone();
+                    } else { // if dialog_selected == 1
+                        game_state.visual_state = game_state.dialog_return_1.clone();
+                    }
                 }
 
                 // Reset selected dialog button
@@ -888,7 +894,7 @@ impl Screen {
             } else if keycode == KeyCode::Esc {
                 // Set up the (lack of) result and return to the previous screen
                 game_state.dialog_result_ready = false;
-                game_state.visual_state = game_state.dialog_return_to.clone();
+                game_state.visual_state = game_state.dialog_return_cancel.clone();
                 
                 // Reset selected dialog button
                 game_state.dialog_selected = 0;

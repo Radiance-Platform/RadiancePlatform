@@ -44,7 +44,9 @@ impl Game {
             dialog_option_1: "".to_string(),
             dialog_selected: 0,
             dialog_result_ready: false,
-            dialog_return_to: VisualState::StartScreen,
+            dialog_return_0: VisualState::StartScreen,
+            dialog_return_1: VisualState::StartScreen,
+            dialog_return_cancel: VisualState::StartScreen,
         };
 
         return Game{game_data, game_state, screen};
@@ -122,7 +124,9 @@ pub struct GameState {
     pub dialog_option_1: String,
     pub dialog_selected: u8,
     pub dialog_result_ready: bool,
-    pub dialog_return_to: VisualState
+    pub dialog_return_0: VisualState,
+    pub dialog_return_1: VisualState,
+    pub dialog_return_cancel: VisualState
 }
 
 impl GameState {
