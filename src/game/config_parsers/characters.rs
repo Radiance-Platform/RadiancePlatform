@@ -33,6 +33,7 @@ fn get_character_from_data(characters: &mut HashMap<String, Character>, data: Ch
         attributes: vec![],
         inventory: vec![],
         icon: ' ',
+        dialog_id: "".to_string(),
     };
     character.inventory.resize(data.inventory_size.width as usize, vec![] );
     for i in 0..(data.inventory_size.width) {
@@ -41,6 +42,7 @@ fn get_character_from_data(characters: &mut HashMap<String, Character>, data: Ch
     character.id = data.id;
     character.name = data.name;
     character.icon = data.icon;
+    character.dialog_id = data.dialog_id;
     //character.role = data.role;
     for attribute_data in data.traits {
         let attribute = Attribute {
@@ -65,6 +67,7 @@ pub struct CharacterData {
     pub inventory_size: InventorySize,
     pub traits: Vec<Trait>,
     pub interactions: Interactions,
+    pub dialog_id: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]

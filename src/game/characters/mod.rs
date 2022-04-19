@@ -15,6 +15,7 @@ pub struct Character {
     pub attributes: Vec<Attribute>,
     pub inventory: Vec<Vec<Option<Object>>>,
     pub icon: char,
+    pub dialog_id: String,
 }
 
 impl Character {

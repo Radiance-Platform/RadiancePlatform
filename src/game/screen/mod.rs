@@ -173,7 +173,7 @@ impl Screen {
         if map.grid[player_x][player_y].is_some() {
             match map.grid[player_x][player_y].as_ref().unwrap()  {
                 MapData::Character(character) => {
-                    self.character_interact(game_state, game_data, character);
+                    self.character_interact(game_state, character);
                 }
                 MapData::Object(object) => {
                     self.activate_object(game_state, game_data, object);
@@ -182,11 +182,13 @@ impl Screen {
         }
     }
 
-    fn character_interact(&self, game_state: &mut GameState, game_data: &mut GameData, character: &Character) {
+    // Starts any interaction that happens when an npc conversation is started
+    //    with the interact key
+    fn character_interact(&self, game_state: &mut GameState, character: &Character) {
+        game_state.dialog_return_cancel = game_state.visual_state.clone();
         game_state.visual_state = VisualState::PlayingCharacterInteraction;
-        // TODO: Get npc starting dialog, then set the dialog id in game_state.
+        game_state.npc_dialog_id = character.dialog_id.clone();
     }
-
 
     // Starts any interaction that happens when an object is activated with the interact key
     fn activate_object(&self, game_state: &mut GameState, game_data: &mut GameData, object: &Object) {
@@ -1089,10 +1091,11 @@ impl Screen {
         let rows = self.current_rows;
         let dialog_height = 8;
 
-        // Temporary dialog to display
-        let npc_dialog = "Why are you here! Go away!".to_string();
-        let dialog_0 = "I'm sorry, I just wanted the key!".to_string();
-        let dialog_1 = "Here, I brought you an item!\n(Open Inventory)".to_string();
+        // Get dialog from hashmap
+        let dialog = game_data.dialogs.get(&game_state.npc_dialog_id).unwrap();
+        let npc_dialog = &dialog.npc_dialog;
+        let dialog_0 = &dialog.option_0.dialog;
+        let dialog_1 = &dialog.option_1.dialog;
 
         // Draw screen borders
         self.draw_border(0, 0, cols, rows)?;
@@ -1146,10 +1149,25 @@ impl Screen {
                 game_state.dialog_selected = 1;
 
             } else if keycode == KeyCode::Enter {
+                let next: &String;
+                if game_state.dialog_selected == 0 {
+                    next = &dialog.option_0.next;
+                } else {
+                    next = &dialog.option_1.next;
+                }
                 // Reset selected dialog
                 game_state.dialog_selected = 0;
 
-                // TODO: select the dialog option
+                if next == "exit" {
+                    game_state.visual_state = game_state.dialog_return_cancel.clone();
+
+                } else if next == "inventory" {
+                    game_state.visual_state = VisualState::PlayingInventory;
+
+                } else if game_data.dialogs.contains_key(next) { // if next is a dialog id
+                    game_state.npc_dialog_id = next.clone();
+
+                }
             }
 
             // Process keypresses for changing screens

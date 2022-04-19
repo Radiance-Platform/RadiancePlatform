@@ -38,3 +38,4 @@ interactions:
           effect_per_point: "-1"
         - skill: "skill_3"
           effect_per_point: "*1.2"
+dialog_id: ""
