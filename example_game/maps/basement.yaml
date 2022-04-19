@@ -8,7 +8,7 @@ objects:
   - id: "angry_antagonist"
     position:
       x: 15
-      y: 9
+      y: 8
   - id: "door_1"
     position:
       x: 5

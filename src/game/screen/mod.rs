@@ -119,6 +119,7 @@ impl Screen {
     // Function to take in a string and determine what column it should start being printed at
     // in order to horizontally center it. `s` should be the string to center.
     fn horizontally_center_start_position(&self, s: &str, container_cols: u16) -> u16 {
+        if container_cols < s.len() as u16 { return 0; } // if there is overflow
         let empty_space = container_cols - (s.len() as u16);
         return empty_space/2;
     }
@@ -126,6 +127,7 @@ impl Screen {
     // Function to take in a number of lines and determine what row (line) they should start
     // being printed at in order to vertically center them.
     fn vertically_center_start_position(&self, c: u16, container_rows: u16) -> u16 {
+        if container_rows < c { return 0; } // if there is overflow
         let empty_space = container_rows - c;
         return empty_space/2;
     }
@@ -172,6 +174,7 @@ impl Screen {
             match map.grid[player_x][player_y].as_ref().unwrap()  {
                 MapData::Character(character) => {
                     // TODO: Handle character interaction
+                    game_state.visual_state = VisualState::PlayingCharacterInteraction;
                 }
                 MapData::Object(object) => {
                     self.activate_object(game_state, game_data, object);
@@ -407,6 +410,35 @@ impl Screen {
         Ok(())
     }
 
+    // Draws a rectangular border with given start coordinates and width/heights, then adds
+    //    text centered in the box.
+    // If highlight is true, adds a highlight ('=' signs around the inside of the border) to
+    //    indicate the box is selected.
+    fn draw_text_box(&self, start_col: u16, start_row: u16, cols: u16, rows: u16, text: &String, highlight: bool) -> Result<()> {
+        if highlight {
+            self.draw_highlight_border(start_col, start_row, cols, rows)?;
+        } else {
+            self.draw_border(start_col, start_row, cols, rows)?;
+        }
+        let text_rows = rows - 4;
+        let text_cols = cols - 4;
+        let text_start_col = start_col + 2;
+        let text_start_row = start_row + 2;
+        let lines = textwrap::wrap(&text, text_cols as usize);
+        let mut row = text_start_row +
+                           self.vertically_center_start_position(lines.len() as u16, text_rows);
+        for line in lines {
+            execute!(
+                stdout(),
+                MoveTo(self.horizontally_center_start_position(&line, text_cols) + text_start_col, row),
+                Print(line),
+            )?;
+            row += 1;
+        }
+
+        Ok(())
+    }
+
     fn draw_item_grid(&self, items: &Vec<Vec<Option<Object>>>, start_col: u16, start_row: u16,
                       selected_col: usize, selected_row: usize) -> Result<()> {
         let box_cols: u16 = 18;
@@ -479,20 +511,31 @@ impl Screen {
         let cols = 18;
         let rows = 7;
         self.draw_border(start_col, start_row, cols, rows)?;
-        if character.name == "player" {
-
+        if character.id == "player" {
+            execute!(
+                stdout(),
+                MoveTo(start_col+5, start_row + 1),
+                Print(".       ."),
+                MoveTo(start_col+3, start_row + 4),
+                Print("|          |"),
+                MoveTo(start_col+3, start_row + 5),
+                Print("+----------+"),
+                MoveTo(start_col + self.horizontally_center_start_position(&character.name, cols), start_row+rows+1),
+                Print(&character.name),
+            )?;
+        } else {
+            execute!(
+                stdout(),
+                MoveTo(start_col+5, start_row + 1),
+                Print("v       v"),
+                MoveTo(start_col+3, start_row + 4),
+                Print("+----------+"),
+                MoveTo(start_col+3, start_row + 5),
+                Print("|          |"),
+                MoveTo(start_col + self.horizontally_center_start_position(&character.name, cols), start_row+rows+1),
+                Print(&character.name),
+            )?;
         }
-        execute!(
-            stdout(),
-            MoveTo(start_col+5, start_row + 1),
-            Print(".       ."),
-            MoveTo(start_col+3, start_row + 4),
-            Print("|          |"),
-            MoveTo(start_col+3, start_row + 5),
-            Print("+----------+"),
-            MoveTo(start_col + self.horizontally_center_start_position(&character.name, cols), start_row+rows+1),
-            Print(&character.name),
-        )?;
 
         Ok(())
     }
@@ -937,12 +980,12 @@ impl Screen {
     // Draws inventory/stat screen.
     // Handles key presses.
     fn draw_playing_inventory(&self, game_data: &mut GameData, game_state: &mut GameState) -> Result<()> {
-        // Dialog box width
+        // Inventory screen width
         let cols = self.current_columns;
         let rows = self.current_rows;
         let grid_start_col: u16 = 28;
 
-        // Draw dialog box border
+        // Draw screen border
         self.draw_border(0, 0, cols, rows)?;
 
         // Draw player face
@@ -997,7 +1040,6 @@ impl Screen {
                 game_state.inventory_y = (game_state.inventory_y + 1) % inventory_height;
 
             } else if keycode == KeyCode::Enter {
-                // TODO: use selected item
                 self.use_object(game_state, game_data);
             }
 
@@ -1036,7 +1078,98 @@ impl Screen {
     }
 
     // TODO: Implementation, documentation
-    fn draw_playing_character_interaction(&self, game_data: &GameData, game_state: &mut GameState) -> Result<()> {
+    fn draw_playing_character_interaction(&self, game_data: &mut GameData, game_state: &mut GameState) -> Result<()> {
+        // Interaction screen width
+        let cols = self.current_columns;
+        let rows = self.current_rows;
+        let dialog_height = 8;
+
+        // Temporary dialog to display
+        let npc_dialog = "Why are you here! Go away!".to_string();
+        let dialog_0 = "I'm sorry, I just wanted the key!".to_string();
+        let dialog_1 = "Here, I brought you an item!\n(Open Inventory)".to_string();
+
+        // Draw screen borders
+        self.draw_border(0, 0, cols, rows)?;
+        self.draw_border(cols/2, 0, cols/2, rows)?;
+
+        // Draw dialog options
+        self.draw_text_box(0, rows-dialog_height,
+             cols/4, dialog_height, &dialog_0, game_state.dialog_selected == 0)?;
+        self.draw_text_box((cols/4) - 1, rows-dialog_height,
+             (cols/4) + 2, dialog_height, &dialog_1, game_state.dialog_selected == 1)?;
+
+        // Draw NPC dialog
+        self.draw_text_box(cols/2, rows-dialog_height,
+             cols/2, dialog_height, &npc_dialog, false)?;
+        // (cover up the dialog box line)
+        stdout().execute(MoveTo((cols/2)+1, rows-dialog_height))?;
+        for _i in 0..((cols/2) - 2) {
+            stdout().execute(Print(" "))?;
+        }
+        stdout().execute(Print("|"))?;
+
+        // Draw player face
+        self.draw_face(11, 2, game_data.info.player.as_ref().unwrap())?;
+
+        // TODO: get NPC character from this spot on the map and draw their face
+
+        // If the keypress has not been processed yet, process it.
+        if !game_state.last_character_processed {
+
+            // Get keypress
+            let keycode = match game_state.last_character_pressed.as_ref().unwrap() {
+                Event::Key(x) => {
+                    x.code
+                },
+                _ => { KeyCode::Null }
+            };
+
+            // Process keypresses for selecting items
+            if keycode == KeyCode::Left {
+                game_state.dialog_selected = 0;
+
+            } else if keycode == KeyCode::Right {
+                game_state.dialog_selected = 1;
+
+            } else if keycode == KeyCode::Enter {
+                // Reset selected dialog
+                game_state.dialog_selected = 0;
+
+                // TODO: select the dialog option
+            }
+
+            // Process keypresses for changing screens
+            if keycode == KeyCode::Char('H') {
+                // Change to start screen
+                game_state.visual_state = VisualState::StartScreen;
+                execute!(
+                    stdout(),
+                    MoveTo(10, 11),
+                    Print("Changing to start screen")
+                )?;
+            } else if keycode == KeyCode::Char('m')
+                   || keycode == KeyCode::Esc {
+                // Reset selected dialog
+                game_state.dialog_selected = 0;
+                // Change to map view
+                game_state.visual_state = VisualState::PlayingMap;
+                execute!(
+                        stdout(),
+                        MoveTo(10, 11),
+                        Print("Changing to map view")
+                    )?;
+            }
+
+            game_state.last_character_processed = true;
+            match self.draw(game_data, game_state) {
+                Ok(_) => {},
+                Err(_) => {
+                    println!("ERROR: Problem encountered while drawing screen, exiting!");
+                    self.end()?;
+                }
+            }
+        }
 
         Ok(())
     }

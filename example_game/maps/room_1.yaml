@@ -21,3 +21,7 @@ objects:
     position:
       x: 13
       y: 6
+  - id: "angry_antagonist"
+    position:
+      x: 11
+      y: 4
