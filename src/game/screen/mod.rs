@@ -173,8 +173,7 @@ impl Screen {
         if map.grid[player_x][player_y].is_some() {
             match map.grid[player_x][player_y].as_ref().unwrap()  {
                 MapData::Character(character) => {
-                    // TODO: Handle character interaction
-                    game_state.visual_state = VisualState::PlayingCharacterInteraction;
+                    self.character_interact(game_state, game_data, character);
                 }
                 MapData::Object(object) => {
                     self.activate_object(game_state, game_data, object);
@@ -182,6 +181,12 @@ impl Screen {
             }
         }
     }
+
+    fn character_interact(&self, game_state: &mut GameState, game_data: &mut GameData, character: &Character) {
+        game_state.visual_state = VisualState::PlayingCharacterInteraction;
+        // TODO: Get npc starting dialog, then set the dialog id in game_state.
+    }
+
 
     // Starts any interaction that happens when an object is activated with the interact key
     fn activate_object(&self, game_state: &mut GameState, game_data: &mut GameData, object: &Object) {
@@ -1112,7 +1117,15 @@ impl Screen {
         // Draw player face
         self.draw_face(11, 2, game_data.info.player.as_ref().unwrap())?;
 
-        // TODO: get NPC character from this spot on the map and draw their face
+        // Get NPC character from this spot on the map and draw their face
+        let map = &game_data.maps[game_state.current_map].clone();
+        match map.grid[game_state.current_player_x as usize]
+                      [game_state.current_player_y as usize].as_ref().unwrap()  {
+            MapData::Character(character) => {
+                self.draw_face((cols/2) + 11, 2, character)?;
+            }
+            MapData::Object(_object) => {}
+        }
 
         // If the keypress has not been processed yet, process it.
         if !game_state.last_character_processed {
