@@ -4,6 +4,7 @@ use crate::game::screen::{Screen, VisualState};
 use crossterm::{event::{Event, KeyCode}, Result};
 
 pub mod characters;
+pub mod dialogs;
 pub mod maps;
 pub mod objects;
 pub mod screen;

@@ -1,0 +1,16 @@
+ - id: "AA start"
+   npc_dialog: "Why are you here! Go away!"
+   option_0:
+      dialog: "I'm sorry, I just wanted the key!"
+      next: "d0"
+   option_1:
+      dialog: "Here, I brought you an item! (Open Inventory)"
+      next: "inventory"
+ - id: "d0"
+   npc_dialog: "You can't have the key."
+   option_0:
+      dialog: "Okay"
+      next: "exit"
+   option_1:
+      dialog: "I will fight you for the key"
+      next: "fight"

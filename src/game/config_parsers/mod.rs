@@ -4,6 +4,7 @@ use walkdir::WalkDir;
 use crate::game::characters::Character;
 use crate::game::objects::Object;
 use crate::game::maps::MapData;
+use crate::game::dialogs::Dialog;
 use std::collections::HashMap;
 use std::error::Error;
 use crate::game::config_parsers::maps::MapItemData;
@@ -12,6 +13,7 @@ mod characters;
 mod game;
 mod maps;
 mod objects;
+mod dialogs;
 
 #[derive(Debug)]
 pub struct GameInfo {
@@ -29,6 +31,7 @@ pub struct GameInfo {
 #[derive(Debug)]
 pub struct GameData {
     pub maps: Vec<Map>,
+    pub dialogs: HashMap<String, Dialog>,
     pub info: GameInfo,
 }
 
@@ -39,6 +42,7 @@ impl GameData {
 
         let mut game_data = GameData{
             maps: Vec::new(),
+            dialogs: HashMap::new(),
             info: GameInfo{
                 name: "".to_string(),
                 description: "".to_string(),
@@ -90,6 +94,7 @@ impl GameData {
                         "maps" => { maps::process_config_serde(&mut map_item_data, entry.path())?; }
                         "characters" => { characters::process_config_serde(&mut characters, entry.path())?; }
                         "objects" => { objects::process_config(&mut objects, entry.path())?; }
+                        "dialogs" => { dialogs::process_config_serde(&mut self.dialogs, entry.path())?; }
                         _ => { println!("Found unknown file '{:?}', ignoring", entry.path()) }
                     }
                 }
