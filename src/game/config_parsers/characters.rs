@@ -46,7 +46,7 @@ fn get_character_from_data(characters: &mut HashMap<String, Character>, data: Ch
     //character.role = data.role;
     for attribute_data in data.traits {
         let attribute = Attribute {
-            name: attribute_data.name,
+            id: attribute_data.id,
             display_name: attribute_data.display_name,
             min_val: 0,
             max_val: attribute_data.max_value,
@@ -78,7 +78,7 @@ pub struct InventorySize {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Trait {
-    pub name: String,
+    pub id: String,
     pub display_name: String,
     pub starting_value: u8,
     pub max_value: u8,
@@ -91,7 +91,7 @@ pub struct Interactions {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Attack {
-    pub name: String,
+    pub id: String,
     pub display_name: String,
     pub base_damage: i64,
     pub affected_by: Vec<AffectedBy>,

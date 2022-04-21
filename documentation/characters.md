@@ -13,6 +13,7 @@ This is a required file that defines an individual character entity in the game.
 | inventory_contents | No        | Array of inventory contents (see below)                       | This defines any inventory contents that are given to the character on creation without the character having to acquire them through gameplay           |
 | attributes         | No        | Array of attributes (see below)                               | This defines any attributes that the character is able to have                                                                                          |
 | interactions       | No        | Array of interactions (see below)                             | This defines any interactions that a character is able to have with another character                                                                   |
+| dialog_id          | Yes       | A string (can be empty) representing a dialog id              | This defines the starting dialog that will be used by the character when the player interacts. The player should have an empty dialog string.           |
 
 `inventory_contents` field:
 
@@ -94,4 +95,5 @@ interactions:
           effect_per_point: "-1"
         - attribute: "skill_3"
           effect_per_point: "*1.2"
+dialog_id: ""
 ```
