@@ -63,37 +63,37 @@ inventory_contents:
       x: 0
       y: 0
 traits:
-  - name: "health"
+  - id: "health"
     display_name: "Health"
     starting_value: 100
     max_value: 100
-  - name: "skill_1"
+  - id: "skill_1"
     display_name: "Skill 1"
     starting_value: 1
     max_value: 10
-  - name: "skill_2"
+  - id: "skill_2"
     display_name: "Skill 2"
     starting_value: 5
     max_value: 10
-  - name: "skill_3"
+  - id: "skill_3"
     display_name: "Skill 3"
     starting_value: 7
     max_value: 10
-  - name: "super_skill_thing"
+  - id: "super_skill_thing"
     display_name: "Super Skill Thing"
     starting_value: 1
     max_value: 10
 interactions:
   attacks:
-    - name: "throw_stick"
+    - id: "throw_stick"
       display_name: "Throw stick"
       base_damage: 5
       affected_by: 
-        - attribute: "skill_1"
+        - attribute_id: "skill_1"
           effect_per_point: "+1"
-        - attribute: "skill_2"
+        - attribute_id: "skill_2"
           effect_per_point: "-1"
-        - attribute: "skill_3"
+        - attribute_id: "skill_3"
           effect_per_point: "*1.2"
 dialog_id: ""
 ```

@@ -32,10 +32,10 @@ interactions:
       display_name: "Throw stick"
       base_damage: 5
       affected_by:
-        - skill: "skill_1"
+        - attribute_id: "skill_1"
           effect_per_point: "+1"
-        - skill: "skill_2"
+        - attribute_id: "skill_2"
           effect_per_point: "-1"
-        - skill: "skill_3"
+        - attribute_id: "skill_3"
           effect_per_point: "*1.2"
 dialog_id: "AA start"

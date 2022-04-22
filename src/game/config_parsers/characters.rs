@@ -99,6 +99,6 @@ pub struct Attack {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct AffectedBy {
-    pub skill: String,
+    pub attribute_id: String,
     pub effect_per_point: String,
 }
