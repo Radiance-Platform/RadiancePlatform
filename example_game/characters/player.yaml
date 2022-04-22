@@ -38,4 +38,5 @@ interactions:
           effect_per_point: "-1"
         - attribute_id: "skill_3"
           effect_per_point: "*1.2"
+  object_use: []
 dialog_id: ""

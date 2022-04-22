@@ -56,6 +56,18 @@ fn get_character_from_data(characters: &mut HashMap<String, Character>, data: Ch
         };
         character.attributes.push(attribute);
     }
+    for object_use_data in data.interactions.object_use {
+        let object_use = interactions::ObjectUse {
+            object_id: object_use_data.object_id,
+            set_dialog: object_use_data.set_dialog,
+            consume_item: object_use_data.consume_item,
+        };
+        character.interactions.object_use.push(object_use);
+    }
+    for attack in data.interactions.attacks {
+        // TODO: Parse attack data into character
+    }
+    //println!("CHARACTER: {:?}", character);
     characters.insert(character.id.clone(), character);
 }
 
@@ -89,6 +101,7 @@ pub struct Trait {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Interactions {
     pub attacks: Vec<Attack>,
+    pub object_use: Vec<ObjectUseData>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -103,4 +116,11 @@ pub struct Attack {
 pub struct AffectedBy {
     pub attribute_id: String,
     pub effect_per_point: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct ObjectUseData {
+    pub object_id: String,
+    pub set_dialog: String,
+    pub consume_item: bool,
 }
