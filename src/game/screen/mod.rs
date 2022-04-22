@@ -241,7 +241,10 @@ impl Screen {
         let map = game_data.maps[game_state.current_map].clone();
         if map.grid[x][y].is_some() {
             match map.grid[x][y].as_ref().unwrap()  {
-                MapData::Character(_character) => { return; /* No object. Do nothing*/ }
+                MapData::Character(character) => {
+                    self.use_object_character(game_state, game_data, character);
+                    return;
+                }
                 MapData::Object(object) => { map_object = object; }
             }
         } else {
@@ -302,6 +305,45 @@ impl Screen {
         return;
     }
 
+    // Uses an object from the player's inventory on a character in the
+    //    player's spot on the map
+    fn use_object_character(&self, game_state: &mut GameState, game_data: &mut GameData, character: &Character) {
+        let i_x = game_state.inventory_x;
+        let i_y = game_state.inventory_y;
+
+        // Get the selected inventory object
+        let inventory_object;
+        let inventory = game_data.info.player.as_ref().unwrap().inventory.clone();
+        if inventory[i_x][i_y].is_some() {
+            inventory_object = inventory[i_x][i_y].as_ref().unwrap();
+        } else {
+            return; // Nothing in inventory slot. This shouldn't really happen at this point.
+        }
+
+        // Find the right interaction for the item
+        for object_use in &character.interactions.object_use {
+            if object_use.object_id == inventory_object.id {
+                // Update character dialog if specified by the interaction
+                if !object_use.set_dialog.is_empty() {
+                    let mut new_character = character.to_owned();
+                    new_character.dialog_id = object_use.set_dialog.to_owned();
+                    game_data.maps[game_state.current_map]
+                            .grid[game_state.current_player_x as usize][game_state.current_player_y as usize]
+                            = Option::<MapData>::Some(MapData::Character(new_character));
+                }
+
+                // If the item is consumed, remove it from the inventory
+                if object_use.consume_item {
+                    let mut new_player = game_data.info.player.as_ref().unwrap().clone();
+                    new_player.inventory[i_x][i_y] = Option::None;
+                    game_data.info.player = Option::<Character>::Some(new_player);
+                }
+            }
+        }
+    }
+
+    // Removes the object from the player's spot on the map and places it in the
+    //     player inventory
     fn collect_object(&self, game_state: &mut GameState, game_data: &mut GameData, object: &Object) {
         // If inventory size is not exceeded, add item to player inventory
         if game_data.info.player.is_none() {

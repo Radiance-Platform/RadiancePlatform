@@ -25,7 +25,7 @@ pub fn process_config_serde(characters: &mut HashMap<String, Character>, config_
 // Converts temporary data structure in to a Character structure and adds it to the characters list
 // so that it can later be added to the game map.
 fn get_character_from_data(characters: &mut HashMap<String, Character>, data: CharacterData) {
-    let mut interactions = interactions::Interactions {
+    let interactions = interactions::Interactions {
         attacks: vec![],
         object_use: vec![],
     };
