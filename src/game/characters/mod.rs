@@ -1,20 +1,20 @@
 
+use crate::game::characters::interactions::Interactions;
 use crate::game::characters::attribute::Attribute;
-use crate::game::characters::role::Role;
 use crate::game::objects::Object;
 
-pub mod role;
 pub mod attribute;
+pub mod interactions;
 
 
 #[derive(Clone, Debug)]
 pub struct Character {
     pub id: String,
     pub name: String,
-    pub role: Role,
     pub attributes: Vec<Attribute>,
     pub inventory: Vec<Vec<Option<Object>>>,
     pub icon: char,
+    pub interactions: Interactions,
     pub dialog_id: String,
 }
 

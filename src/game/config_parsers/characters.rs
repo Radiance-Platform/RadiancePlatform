@@ -2,8 +2,7 @@ use std::collections::HashMap;
 use std::fs;
 use std::path::Path;
 use serde::{Serialize,Deserialize};
-use crate::game::characters::{Character};
-use crate::game::characters::role::Role;
+use crate::game::characters::{Character, interactions};
 use crate::game::characters::attribute::Attribute;
 use crate::game::objects::Object;
 
@@ -26,13 +25,17 @@ pub fn process_config_serde(characters: &mut HashMap<String, Character>, config_
 // Converts temporary data structure in to a Character structure and adds it to the characters list
 // so that it can later be added to the game map.
 fn get_character_from_data(characters: &mut HashMap<String, Character>, data: CharacterData) {
+    let mut interactions = interactions::Interactions {
+        attacks: vec![],
+        object_use: vec![],
+    };
     let mut character = Character{
         id: "".to_string(),
         name: "".to_string(),
-        role: Role { role: "".to_string() },
         attributes: vec![],
         inventory: vec![],
         icon: ' ',
+        interactions: interactions,
         dialog_id: "".to_string(),
     };
     character.inventory.resize(data.inventory_size.width as usize, vec![] );
@@ -43,7 +46,6 @@ fn get_character_from_data(characters: &mut HashMap<String, Character>, data: Ch
     character.name = data.name;
     character.icon = data.icon;
     character.dialog_id = data.dialog_id;
-    //character.role = data.role;
     for attribute_data in data.traits {
         let attribute = Attribute {
             id: attribute_data.id,
