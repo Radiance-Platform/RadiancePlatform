@@ -34,9 +34,10 @@ This is a required file that defines an individual character entity in the game.
 `interactions` field:
 Other types of interactions may be added in the future.
 
-| Field        | Required? | Valid Values                  | Description                                                                                 |
-|--------------|-----------|-------------------------------|---------------------------------------------------------------------------------------------|
-| attacks      | No        | Array of interactions_attacks | This defines any attack-based interactions between this character and another when fighting |
+| Field        | Required? | Valid Values                      | Description                                                                                                           |
+|--------------|-----------|-----------------------------------|-----------------------------------------------------------------------------------------------------------------------|
+| attacks      | No        | Array of interactions_attacks     | This defines any attack-based interactions between this character and another when fighting                           |
+| object_use   | No        | Array of interactions_object_use  | This defines the effects of using objects on this character. If this list is empty, use: `object_use: []`             |
 
 `interactions_attacks` field:
 An attack is a type of interaction that applies when the character is attacking another character.  
@@ -48,6 +49,14 @@ An attack is a type of interaction that applies when the character is attacking 
 | base_damage  | Yes       | Any integer greater than 0                                                                                                    | This is the minimum damage the attack will attempt to inflict on an opposing character, before being affected by any attributes from either character |
 | affected_by  | No        | Both an "attribute_id" (`id` from one of the player's `attribute`s, and an "effect_per_point" value of (+,-,*,/) and a number | This defines any attribute effects on the interaction, applied once per point the character has of the attribute                                      |
 
+`interactions_object_use` field:
+An object_use is a type of interaction that applies when the player uses an item from their inventory on the character.
+
+| Field        | Required? | Valid Values                                  | Description                                                                                                                                           |
+|--------------|-----------|-----------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------|
+| object_id    | Yes       | An object id                                  | The id of the object that can be used                                                                                                    |
+| set_dialog   | Yes       | A dialog id (or "" if none)                   | This is the dialog id of the dialog that the character will have after the item is used on it. If this is "", the dialog is not changed. |
+| consume_item | Yes       | Any boolean                                   | This indicates whether or not the item will be destroyed once it is used.                                                                |
 
 # Sample config
 ```yaml
@@ -95,5 +104,14 @@ interactions:
           effect_per_point: "-1"
         - attribute_id: "skill_3"
           effect_per_point: "*1.2"
+  object_use: []
 dialog_id: ""
+```
+
+# Non-empty object_use
+```yaml
+  object_use:
+    - object_id: "hat"
+      set_dialog: "AA give hat"
+      consume_item: true
 ```
