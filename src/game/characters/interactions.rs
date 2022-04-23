@@ -9,7 +9,7 @@ pub struct Interactions {
 pub struct Attack {
     pub id: String,
     pub display_name: String,
-    pub base_damage: u8,
+    pub base_damage: i64,
     pub affected_by: Vec<Modifier>,
 }
 

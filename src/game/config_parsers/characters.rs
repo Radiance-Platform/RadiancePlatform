@@ -64,8 +64,23 @@ fn get_character_from_data(characters: &mut HashMap<String, Character>, data: Ch
         };
         character.interactions.object_use.push(object_use);
     }
-    for attack in data.interactions.attacks {
-        // TODO: Parse attack data into character
+    for attack_data in data.interactions.attacks {
+        let mut attack = interactions::Attack {
+            id: attack_data.id,
+            display_name: attack_data.display_name,
+            base_damage: attack_data.base_damage,
+            affected_by: vec![],
+        };
+        for modifier_data in attack_data.affected_by {
+            let sign = modifier_data.effect_per_point.chars().next().unwrap();
+            let value: f32 = modifier_data.effect_per_point[1..].parse().unwrap();
+            attack.affected_by.push(interactions::Modifier {
+                attribute_id: modifier_data.attribute_id,
+                sign: sign,
+                value: value,
+            });
+        }
+        character.interactions.attacks.push(attack);
     }
     //println!("CHARACTER: {:?}", character);
     characters.insert(character.id.clone(), character);
