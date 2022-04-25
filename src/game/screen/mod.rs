@@ -18,7 +18,6 @@ use crossterm::terminal::{disable_raw_mode, enable_raw_mode, Clear, ClearType};
 use crate::game::maps::MapData;
 use crate::game::characters::Character;
 use crate::game::characters::attribute;
-use super::maps::Map;
 use super::objects::{ObjectInteraction, Object};
 
 #[derive(Clone, Debug)]
@@ -215,7 +214,19 @@ impl Screen {
             match interaction {
                 ObjectInteraction::ObjectInteractionActivate(activate) => {
                     if !object.prereqs_met(&activate.prereqs) {
-                        // TODO: Display a message here?
+                        // TODO: Add a more personalized dialog box here.
+                        //   Specify in config file?
+                        if object.category == "door" {
+                            // Display dialog for door being locked
+                            game_state.dialog_message = "The door is locked! Try to find a key.".to_string();
+                            game_state.dialog_option_0 = "Open inventory".to_string();
+                            game_state.dialog_option_1 = "Close".to_string();
+                            game_state.dialog_return_0 = VisualState::PlayingInventory;
+                            game_state.dialog_return_1 = game_state.visual_state.clone();
+                            game_state.dialog_return_cancel = game_state.visual_state.clone();
+                            game_state.pre_exit = false;
+                            game_state.visual_state = VisualState::PlayingDialog;
+                        }
                         continue;
                     }
                     if activate.category == "travel" {
@@ -229,7 +240,6 @@ impl Screen {
     }
 
     // Uses the object currently selected in the inventory on the object currently under the player.
-    // TODO: Display some dialog if the object can't be used in this way for any reason.
     fn use_object(&self, game_state: &mut GameState, game_data: &mut GameData) {
         let x = game_state.current_player_x as usize;
         let y = game_state.current_player_y as usize;
@@ -248,7 +258,9 @@ impl Screen {
                 MapData::Object(object) => { map_object = object; }
             }
         } else {
-            return; // Nothing to use the object on. Do nothing.
+            // Nothing to use the object on. Display dialog and do nothing.
+            self.show_game_message(game_state, format!("You can't use this item here!"));
+            return;
         }
 
         // Get the selected inventory object
@@ -260,16 +272,22 @@ impl Screen {
             return; // Nothing in inventory slot. This shouldn't really happen at this point.
         }
 
+        let mut object_used = false;
         // find object use interaction
         for interaction in &map_object.interactions {
             match interaction {
                 ObjectInteraction::ObjectInteractionActivate(_activate) => {}
                 ObjectInteraction::ObjectInteractionObjectUse(object_use) => {
                     if object_use.foreign_object_id != inventory_object.id {
-                        return;
+                        continue;
                     }
+                    // The item was used. Display message.
+                    self.show_game_message(game_state, format!("You used the {} on the {}!",
+                                                    inventory_object.name, map_object.name));
+                    // Go through each action in the interaction
                     for action in &object_use.self_action {
                         // Perform all self-actions
+                        object_used = true;
                         let mut new_map_object = map_object.clone();
                         new_map_object.set_state(action.name.clone(), action.value);
                         game_data.maps[game_state.current_map]
@@ -301,7 +319,11 @@ impl Screen {
                 }
             }
         }
-
+        if !object_used {
+            let message = format!("You tried to use the {} on the {}, but it didn't work!",
+                                                inventory_object.name, map_object.name);
+            self.show_game_message(game_state, message);
+        }
         return;
     }
 
@@ -321,8 +343,11 @@ impl Screen {
         }
 
         // Find the right interaction for the item
+        let mut object_used = false;
         for object_use in &character.interactions.object_use {
             if object_use.object_id == inventory_object.id {
+                object_used = true;
+
                 // Update character dialog if specified by the interaction
                 if !object_use.set_dialog.is_empty() {
                     let mut new_character = character.to_owned();
@@ -339,6 +364,9 @@ impl Screen {
                     game_data.info.player = Option::<Character>::Some(new_player);
                 }
             }
+        }
+        if !object_used {
+            self.show_game_message(game_state, format!("You can't use this item here!"));
         }
     }
 
@@ -406,6 +434,20 @@ impl Screen {
                 }
             }
         }
+    }
+
+    // Sets the dialog screen to display a popup with the specified msg string.
+    //    The popup closes upon clicking return and returns to the current
+    //    screen.
+    fn show_game_message(&self, game_state: &mut GameState, msg: String) {
+            game_state.dialog_message = msg;
+            game_state.dialog_option_0 = "Continue".to_string();
+            game_state.dialog_option_1 = "Close".to_string();
+            game_state.dialog_return_0 = game_state.visual_state.clone();
+            game_state.dialog_return_1 = game_state.visual_state.clone();
+            game_state.dialog_return_cancel = game_state.visual_state.clone();
+            game_state.pre_exit = false;
+            game_state.visual_state = VisualState::PlayingDialog;
     }
 
     // Draws a rectangular border with given start coordinates and width/heights
@@ -1126,7 +1168,9 @@ impl Screen {
         Ok(())
     }
 
-    // TODO: Implementation, documentation
+    // Draws the player interaction screen. Shows the player character and the
+    //    NPC being interacted with. Shows the NPC dialog and gives the player
+    //    dialog options that can be selected.
     fn draw_playing_character_interaction(&self, game_data: &mut GameData, game_state: &mut GameState) -> Result<()> {
         // Interaction screen width
         let cols = self.current_columns;
