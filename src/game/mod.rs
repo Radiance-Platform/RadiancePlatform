@@ -1,7 +1,7 @@
 use std::process::exit;
 use config_parsers::GameData;
-use crate::game::screen::{Screen, VisualState};
 use crossterm::{event::{Event, KeyCode}, Result};
+use crate::game::screen::{Screen, VisualState};
 
 pub mod characters;
 pub mod dialogs;

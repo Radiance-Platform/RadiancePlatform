@@ -1,4 +1,3 @@
-
 use crate::game::characters::interactions::Interactions;
 use crate::game::characters::attribute::Attribute;
 use crate::game::objects::Object;

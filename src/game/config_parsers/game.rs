@@ -12,11 +12,9 @@ pub fn process_config(game_data: &mut GameData, config_path: &Path) -> Result<()
 
     // Convert to YAML
     let docs = YamlLoader::load_from_str(&*file_contents).unwrap();
+
     // Multi document support, doc is a yaml::Yaml, need to extract the doc
     let doc = &docs[0];
-
-    // Debug print
-    //println!("GAME DOC: {:?}\n", doc);
 
     let game_info_hash = doc.as_hash().unwrap();
 
