@@ -4,12 +4,11 @@ use std::path::Path;
 use std::collections::HashMap;
 use yaml_rust::YamlLoader;
 use yaml_rust::Yaml;
-use crate::game::objects::{Object, ObjectState,
-                           ObjectInteraction, ObjectInteractionActivate,
+use crate::game::objects::{Object, ObjectState, ObjectInteraction, ObjectInteractionActivate,
                            ObjectInteractionObjectUse};
 
 // Takes an object config file and loads it into an object, then adds that object to the objects list
-//      so that it can later be added to the game map.
+// so that it can later be added to the game map.
 pub fn process_config(objects: &mut HashMap<String, Object>, config_path: &Path) -> Result<(), Box<dyn Error>> {
 
     // Load file contents
@@ -17,6 +16,7 @@ pub fn process_config(objects: &mut HashMap<String, Object>, config_path: &Path)
 
     // Convert to YAML
     let docs = YamlLoader::load_from_str(&*file_contents).unwrap();
+
     // Multi document support, doc is a yaml::Yaml, need to extract the doc
     let doc = &docs[0];
 

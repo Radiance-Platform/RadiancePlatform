@@ -1,25 +1,20 @@
 use std::fmt::Debug;
-use crate::game::config_parsers::GameData;
-use crate::game::GameState;
-
 use std::io::{Error, ErrorKind, stdout};
 use std::process::{exit};
-
+use crate::game::config_parsers::GameData;
+use crate::game::GameState;
+use crate::game::maps::MapData;
+use crate::game::characters::Character;
+use crate::game::characters::attribute;
+use crate::game::objects::{ObjectInteraction, Object};
 use crossterm::{
     execute,
     style::{Print},
     ExecutableCommand, Result,
-    terminal::{SetSize, size},
-    cursor::{MoveTo}
+    terminal::{SetSize, size, disable_raw_mode, enable_raw_mode, Clear, ClearType},
+    cursor::{MoveTo, Hide, Show},
+    event::{Event, KeyCode},
 };
-use crossterm::cursor::{Hide, Show};
-use crossterm::event::{Event, KeyCode};
-use crossterm::terminal::{disable_raw_mode, enable_raw_mode, Clear, ClearType};
-use crate::game::maps::MapData;
-use crate::game::characters::Character;
-use crate::game::characters::attribute;
-use super::maps::Map;
-use super::objects::{ObjectInteraction, Object};
 
 #[derive(Clone, Debug)]
 pub enum VisualState {

@@ -35,7 +35,7 @@ fn get_character_from_data(characters: &mut HashMap<String, Character>, data: Ch
         attributes: vec![],
         inventory: vec![],
         icon: ' ',
-        interactions: interactions,
+        interactions,
         dialog_id: "".to_string(),
     };
     character.inventory.resize(data.inventory_size.width as usize, vec![] );
@@ -76,18 +76,16 @@ fn get_character_from_data(characters: &mut HashMap<String, Character>, data: Ch
             let value: f32 = modifier_data.effect_per_point[1..].parse().unwrap();
             attack.affected_by.push(interactions::Modifier {
                 attribute_id: modifier_data.attribute_id,
-                sign: sign,
-                value: value,
+                sign,
+                value,
             });
         }
         character.interactions.attacks.push(attack);
     }
-    //println!("CHARACTER: {:?}", character);
     characters.insert(character.id.clone(), character);
 }
 
-// Temporary data structure CharacterData is used for Serde parsing and nothing else.
-
+// Temporary data structure that is used for Serde parsing and nothing else
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CharacterData {
     pub id: String,

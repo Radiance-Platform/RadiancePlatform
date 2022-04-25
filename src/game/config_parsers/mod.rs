@@ -1,13 +1,12 @@
 use std::ffi::OsStr;
-use crate::game::maps::{Map, MapInfo};
 use walkdir::WalkDir;
+use crate::game::config_parsers::maps::MapItemData;
+use crate::game::maps::{Map, MapInfo, MapData};
 use crate::game::characters::Character;
 use crate::game::objects::Object;
-use crate::game::maps::MapData;
 use crate::game::dialogs::Dialog;
 use std::collections::HashMap;
 use std::error::Error;
-use crate::game::config_parsers::maps::MapItemData;
 
 mod characters;
 mod game;
@@ -106,7 +105,7 @@ impl GameData {
     }
 
     // Takes the MapItemData, characters list, and objects list and inserts the characters and objects
-    //     in the right spaces in the game map
+    // in the right spaces in the game map
     fn set_map_grid(&mut self, map_item_data: Vec<MapItemData>, characters: HashMap<String, Character>,
                                                                 objects: HashMap< String, Object> ) -> Result<(), Box<dyn Error>> {
         for map_item in map_item_data {

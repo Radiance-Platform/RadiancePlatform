@@ -1,18 +1,13 @@
 use serde::{Serialize,Deserialize};
 
+// Object data structure. These are items found in the game maps, or given to the player
+// via an interaction. These make up the majority of the game's interactivity.
+
 #[derive(Clone, Debug)]
 pub struct ObjectState {
     pub name: String,
     pub value: bool
 }
-
-
-/*#[derive(Clone, Debug)]
-pub struct ObjectInteraction {
-    pub category: ObjectInteractionCategory,
-    pub values: String
-}*/
-
 
 #[derive(Clone, Debug)]
 pub enum ObjectInteraction {
@@ -39,7 +34,7 @@ pub struct ObjectInteractionWorld {
 
 }
 
-// TODO: Object's categories should probably be some sort of type rather than arbitrary strings
+// TODO: Future Enhancement: Object's categories should probably be some sort of type rather than arbitrary strings
 /*pub enum ObjectCategory {
 "simple",
 "collidable"
