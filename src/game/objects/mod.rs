@@ -54,23 +54,23 @@ pub struct Object {
 
 impl Object {
     // Checks a list of state prereqs to see if they are all met in the object.
-    pub fn prereqs_met(&self, prereqs: &Vec<ObjectState>) -> bool {
+    pub fn prereqs_met(&self, prereqs: &[ObjectState]) -> bool {
         for prereq in prereqs {
             if self.get_state(&prereq.name) != prereq.value {
                 return false;
             }
         }
-        return true;
+        true
     }
 
     // Returns state value from state id
-    pub fn get_state(&self, state_name: &String) -> bool {
+    pub fn get_state(&self, state_name: &str) -> bool {
         for s in &self.state {
             if s.name.eq(state_name) {
                 return s.value;
             }
         }
-        return false;
+        false
     }
 
     // Sets state with state_name to state_val.

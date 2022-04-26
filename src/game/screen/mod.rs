@@ -41,7 +41,7 @@ impl Screen {
     fn check_screen_size() -> Result<()> {
         let error_terminal_too_small = Error::new(ErrorKind::Other, "Terminal size is too small, must be at least 80x20");
         let (cols, rows) = size()?;
-        return if cols < 80 || rows < 20 {
+        if cols < 80 || rows < 20 {
             Err(error_terminal_too_small)
         } else {
             Ok(())
@@ -107,8 +107,7 @@ impl Screen {
             }
         };
 
-        return screen;
-
+        screen
     }
 
     // Function to take in a string and determine what column it should start being printed at
@@ -116,7 +115,7 @@ impl Screen {
     fn horizontally_center_start_position(&self, s: &str, container_cols: u16) -> u16 {
         if container_cols < s.len() as u16 { return 0; } // if there is overflow
         let empty_space = container_cols - (s.len() as u16);
-        return empty_space/2;
+        empty_space/2
     }
 
     // Function to take in a number of lines and determine what row (line) they should start
@@ -124,7 +123,7 @@ impl Screen {
     fn vertically_center_start_position(&self, c: u16, container_rows: u16) -> u16 {
         if container_rows < c { return 0; } // if there is overflow
         let empty_space = container_rows - c;
-        return empty_space/2;
+        empty_space/2
     }
 
     // Test function to use for making sure I can blink the cursor like when a character is over
@@ -187,24 +186,20 @@ impl Screen {
 
     // Starts any interaction that happens when an object is activated with the interact key
     fn activate_object(&self, game_state: &mut GameState, game_data: &mut GameData, object: &Object) {
-        match object.category.as_str() {
-            "collectable" => {
-                // Remove item from map and add to inventory
-                self.collect_object(game_state, game_data, object);
-                // display "found item" dialog
-                game_state.dialog_message = format!("You've found the {}!\n\nNow, what will you do with it?"
-                                                    , object.name);
-                game_state.dialog_option_0 = "Open inventory".to_string();
-                game_state.dialog_option_1 = "Close".to_string();
-                game_state.dialog_return_0 = VisualState::PlayingInventory;
-                game_state.dialog_return_1 = game_state.visual_state.clone();
-                game_state.dialog_return_cancel = game_state.visual_state.clone();
-                game_state.pre_exit = false;
-                game_state.visual_state = VisualState::PlayingDialog;
-                return;
-            }
-            _ => {
-            }
+        if object.category.as_str() == "collectable" {
+            // Remove item from map and add to inventory
+            self.collect_object(game_state, game_data, object);
+            // display "found item" dialog
+            game_state.dialog_message = format!("You've found the {}!\n\nNow, what will you do with it?"
+                                                , object.name);
+            game_state.dialog_option_0 = "Open inventory".to_string();
+            game_state.dialog_option_1 = "Close".to_string();
+            game_state.dialog_return_0 = VisualState::PlayingInventory;
+            game_state.dialog_return_1 = game_state.visual_state.clone();
+            game_state.dialog_return_cancel = game_state.visual_state.clone();
+            game_state.pre_exit = false;
+            game_state.visual_state = VisualState::PlayingDialog;
+            return;
         }
         for interaction in &object.interactions {
             match interaction {
@@ -242,6 +237,12 @@ impl Screen {
         let i_x = game_state.inventory_x;
         let i_y = game_state.inventory_y;
 
+        // Check that there is an item selected
+        let inventory = game_data.info.player.as_ref().unwrap().inventory.clone();
+        if inventory[i_x][i_y].is_none() {
+            return; // Nothing in inventory slot.
+        }
+
         // Get the object on the map to use the item on
         let map_object;
         let map = game_data.maps[game_state.current_map].clone();
@@ -255,19 +256,12 @@ impl Screen {
             }
         } else {
             // Nothing to use the object on. Display dialog and do nothing.
-            self.show_game_message(game_state, format!("You can't use this item here!"));
+            self.show_game_message(game_state, "You can't use this item here!".to_string());
             return;
         }
 
         // Get the selected inventory object
-        let inventory_object;
-        let inventory = game_data.info.player.as_ref().unwrap().inventory.clone();
-        if inventory[i_x][i_y].is_some() {
-            inventory_object = inventory[i_x][i_y].as_ref().unwrap();
-        } else {
-            return; // Nothing in inventory slot. This shouldn't really happen at this point.
-        }
-
+        let inventory_object = inventory[i_x][i_y].as_ref().unwrap();
         let mut object_used = false;
         // find object use interaction
         for interaction in &map_object.interactions {
@@ -330,13 +324,11 @@ impl Screen {
         let i_y = game_state.inventory_y;
 
         // Get the selected inventory object
-        let inventory_object;
         let inventory = game_data.info.player.as_ref().unwrap().inventory.clone();
-        if inventory[i_x][i_y].is_some() {
-            inventory_object = inventory[i_x][i_y].as_ref().unwrap();
-        } else {
-            return; // Nothing in inventory slot. This shouldn't really happen at this point.
+        if inventory[i_x][i_y].is_none() {
+            return; // Nothing in inventory slot.
         }
+        let inventory_object = inventory[i_x][i_y].as_ref().unwrap();
 
         // Find the right interaction for the item
         let mut object_used = false;
@@ -362,7 +354,7 @@ impl Screen {
             }
         }
         if !object_used {
-            self.show_game_message(game_state, format!("You can't use this item here!"));
+            self.show_game_message(game_state, "You can't use this item here!".to_string());
         }
     }
 
@@ -459,12 +451,10 @@ impl Screen {
                     } else {
                         stdout().execute(Print("-"))?;
                     }
-                } else {
-                    if c == start_col || c == start_col+cols-1 {
+                } else if c == start_col || c == start_col+cols-1 {
                         stdout().execute(Print("|"))?;
-                    } else {
-                        stdout().execute(Print(" "))?;
-                    }
+                } else {
+                    stdout().execute(Print(" "))?;
                 }
             }
         }
@@ -501,7 +491,7 @@ impl Screen {
     //    text centered in the box.
     // If highlight is true, adds a highlight ('=' signs around the inside of the border) to
     //    indicate the box is selected.
-    fn draw_text_box(&self, start_col: u16, start_row: u16, cols: u16, rows: u16, text: &String, highlight: bool) -> Result<()> {
+    fn draw_text_box(&self, start_col: u16, start_row: u16, cols: u16, rows: u16, text: &str, highlight: bool) -> Result<()> {
         if highlight {
             self.draw_highlight_border(start_col, start_row, cols, rows)?;
         } else {
@@ -511,7 +501,7 @@ impl Screen {
         let text_cols = cols - 4;
         let text_start_col = start_col + 2;
         let text_start_row = start_row + 2;
-        let lines = textwrap::wrap(&text, text_cols as usize);
+        let lines = textwrap::wrap(text, text_cols as usize);
         let mut row = text_start_row +
                            self.vertically_center_start_position(lines.len() as u16, text_rows);
         for line in lines {
@@ -526,7 +516,7 @@ impl Screen {
         Ok(())
     }
 
-    fn draw_item_grid(&self, items: &Vec<Vec<Option<Object>>>, start_col: u16, start_row: u16,
+    fn draw_item_grid(&self, items: &[Vec<Option<Object>>], start_col: u16, start_row: u16,
                       selected_col: usize, selected_row: usize) -> Result<()> {
         let box_cols: u16 = 18;
         let mut box_rows: u16 = 7;
@@ -578,7 +568,7 @@ impl Screen {
 
     // Draw stats (attributes) in a list with the top right corner at (start_col, start_row).
     //    Stats are in format: <stat name>: <current_value>/<max_value>
-    fn draw_stat_display(&self, stats: &Vec<attribute::Attribute>, start_col: u16, start_row: u16) -> Result<()> {
+    fn draw_stat_display(&self, stats: &[attribute::Attribute], start_col: u16, start_row: u16) -> Result<()> {
         let mut row = 0;
         for stat in stats {
             // TODO: Figure out stat bar formatting
@@ -782,7 +772,7 @@ impl Screen {
             } else if keycode == KeyCode::Char('M') {
                 // Change to the next map
                 if game_state.current_map + 1 <  game_data.maps.len() {
-                    game_state.current_map = game_state.current_map + 1;
+                    game_state.current_map += 1;
                 } else {
                     game_state.current_map = 0;
                 }
@@ -868,13 +858,13 @@ impl Screen {
                 match map.grid[target_x as usize][target_y as usize].as_ref().unwrap() {
                     MapData::Character(_) => {
                         // All characters can be walked over (for interacting)
-                        return true;
+                        true
                     }
                     MapData::Object(object) => {
                         // Only collidable objects can't be walked over
                         match object.category.as_str() {
-                            "collidable" => { return false; }
-                            _ => { return true; }
+                            "collidable" => { false }
+                            _ => { true }
                         }
                     }
 
@@ -882,7 +872,7 @@ impl Screen {
 
             } else {
                 // Empty space, they can obviously go there
-                return true;
+                true
             }
 
         } else if target_x == 0 || target_x == (map.grid.len()-1) as i16 ||
@@ -893,19 +883,19 @@ impl Screen {
                 match map.grid[target_x as usize][target_y as usize].as_ref().unwrap() {
                     MapData::Object(object) => {
                         match object.category.as_str() {
-                            "door" => { return true; }
-                            _ => { return false; }
+                            "door" => { true }
+                            _ => { false }
                         }
                     }
-                    _ => { return false; } // Although this should never happen (no characters in walls!)
+                    _ => { false } // Although this should never happen (no characters in walls!)
                 }
             } else {
                 // This is a wall, they cannot enter it
-                return false;
+                false
             }
         } else {
             // No idea where they are, but they def shouldn't be there and can't go anywhere
-            return false;
+            false
         }
 
     }
@@ -1087,12 +1077,12 @@ impl Screen {
         self.draw_item_grid(inventory, grid_start_col, 0, game_state.inventory_x, game_state.inventory_y)?;
 
         let inventory_width = inventory.len();
-        let inventory_height;
-        if inventory_width > 0 {
-            inventory_height = inventory[0].len();
-        } else {
-            inventory_height = 0;
-        }
+        let inventory_height =
+            if inventory_width > 0 {
+                inventory[0].len()
+            } else {
+                0
+            };
 
         // If the keypress has not been processed yet, process it.
         if !game_state.last_character_processed {
@@ -1110,7 +1100,7 @@ impl Screen {
                 if game_state.inventory_x == 0 {
                     game_state.inventory_x = inventory_width - 1
                 } else {
-                    game_state.inventory_x = game_state.inventory_x - 1;
+                    game_state.inventory_x -= 1;
                 }
 
             } else if keycode == KeyCode::Right {
@@ -1120,7 +1110,7 @@ impl Screen {
                 if game_state.inventory_y == 0 {
                     game_state.inventory_y = inventory_height - 1
                 } else {
-                    game_state.inventory_y = game_state.inventory_y - 1;
+                    game_state.inventory_y -= 1;
                 }
 
             } else if keycode == KeyCode::Down {
@@ -1185,13 +1175,13 @@ impl Screen {
 
         // Draw dialog options
         self.draw_text_box(0, rows-dialog_height,
-             cols/4, dialog_height, &dialog_0, game_state.dialog_selected == 0)?;
+             cols/4, dialog_height, dialog_0, game_state.dialog_selected == 0)?;
         self.draw_text_box((cols/4) - 1, rows-dialog_height,
-             (cols/4) + 2, dialog_height, &dialog_1, game_state.dialog_selected == 1)?;
+             (cols/4) + 2, dialog_height, dialog_1, game_state.dialog_selected == 1)?;
 
         // Draw NPC dialog
         self.draw_text_box(cols/2, rows-dialog_height,
-             cols/2, dialog_height, &npc_dialog, false)?;
+             cols/2, dialog_height, npc_dialog, false)?;
         // (cover up the dialog box line)
         stdout().execute(MoveTo((cols/2)+1, rows-dialog_height))?;
         for _i in 0..((cols/2) - 2) {
@@ -1231,12 +1221,12 @@ impl Screen {
                 game_state.dialog_selected = 1;
 
             } else if keycode == KeyCode::Enter {
-                let next: &String;
-                if game_state.dialog_selected == 0 {
-                    next = &dialog.option_0.next;
-                } else {
-                    next = &dialog.option_1.next;
-                }
+                let next =
+                    if game_state.dialog_selected == 0 {
+                        &dialog.option_0.next
+                    } else {
+                        &dialog.option_1.next
+                    };
                 // Reset selected dialog
                 game_state.dialog_selected = 0;
 

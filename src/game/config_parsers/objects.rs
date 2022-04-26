@@ -32,7 +32,7 @@ pub fn process_config(objects: &mut HashMap<String, Object>, config_path: &Path)
     let object_hash = doc.as_hash().unwrap();
 
     for key in object_hash.keys() {
-        let val = object_hash.get(&key).unwrap_or(&key);
+        let val = object_hash.get(key).unwrap_or(key);
         let key_str = key.as_str().unwrap();
         if val == &Yaml::Null { /* sometimes there are no states/interactions specified */
             continue;
@@ -71,7 +71,7 @@ pub fn process_config(objects: &mut HashMap<String, Object>, config_path: &Path)
 fn parse_object_interactions( object: &mut Object, yaml_interactions: &Yaml) {
     let interaction_hash = yaml_interactions.as_hash().unwrap();
     for key in interaction_hash.keys() {
-        let val = interaction_hash.get(&key).unwrap_or(&key);
+        let val = interaction_hash.get(key).unwrap_or(key);
         let key_str = key.as_str().unwrap();
         match key_str {
             "activate" => {
@@ -158,7 +158,7 @@ fn parse_state_changes(state_changes: &mut Vec<ObjectState>, yaml_changes: &Yaml
     }
 }
 
-fn parse_object_states(object: &mut Object, yaml_states: &Vec<Yaml>) {
+fn parse_object_states(object: &mut Object, yaml_states: &[Yaml]) {
     for yaml_state in yaml_states {
         let mut state = ObjectState{
             name: "".to_string(),

@@ -57,7 +57,7 @@ impl GameData {
 
         game_data.scan_config(config_path).expect("Error scanning configuration files, aborting!");
 
-        return game_data;
+        game_data
     }
 
     // Scans the provided configuration path and calls the type-specific configuration parsers on each file
