@@ -314,7 +314,6 @@ impl Screen {
                                                 inventory_object.name, map_object.name);
             self.show_game_message(game_state, message);
         }
-        return;
     }
 
     // Uses an object from the player's inventory on a character in the
@@ -521,8 +520,8 @@ impl Screen {
         let box_cols: u16 = 18;
         let mut box_rows: u16 = 7;
 
-        for c in 0..items.len() {
-            for r in 0..items[c].len() {
+        for (c, column) in items.iter().enumerate() {
+            for (r, item_slot) in column.iter().enumerate() {
                 // Draw the box for this array spot
                 let box_start_col = start_col + (c as u16)*(box_cols-1);
                 let box_start_row = start_row + (r as u16)*(box_rows-1);
@@ -534,7 +533,7 @@ impl Screen {
                 } else {
                     self.draw_border(box_start_col, box_start_row, box_cols, box_rows)?;
                 }
-                if items[c][r].is_some() {
+                if item_slot.is_some() {
                     let item = items[c][r].as_ref().unwrap();
                     // display item name and icon
                     let name = item.name.clone();
@@ -569,16 +568,14 @@ impl Screen {
     // Draw stats (attributes) in a list with the top right corner at (start_col, start_row).
     //    Stats are in format: <stat name>: <current_value>/<max_value>
     fn draw_stat_display(&self, stats: &[attribute::Attribute], start_col: u16, start_row: u16) -> Result<()> {
-        let mut row = 0;
-        for stat in stats {
+        for (row, stat) in stats.iter().enumerate() {
             // TODO: Figure out stat bar formatting
             let line = format!("{}: {}/{}", stat.display_name, stat.current_val, stat.max_val);
             execute!(
                 stdout(),
-                MoveTo(start_col, start_row + row),
+                MoveTo(start_col, start_row + row as u16),
                 Print(line),
             )?;
-            row += 1;
         }
 
         Ok(())
@@ -707,11 +704,11 @@ impl Screen {
         self.draw_border(0, 0, 80, 2+description.len() as u16)?;
 
         // Draw the map room description
-        for i in 0..description.len() {
+        for (i, line) in description.iter().enumerate() {
             execute!(
                 stdout(),
                 MoveTo(2, 1+i as u16),
-                Print(&description[i]),
+                Print(line),
             )?;
         }
 
@@ -925,12 +922,12 @@ impl Screen {
 
         // Draw the dialog message
         let vertical_start = self.vertically_center_start_position(message.len() as u16, self.current_rows);
-        for i in 0..message.len() {
+        for (i, line) in message.iter().enumerate() {
             execute!(
                 stdout(),
                 //MoveTo((cols-width)/2+2, (rows-height)/2+1+i as u16),
-                MoveTo(self.horizontally_center_start_position(&message[i], self.current_columns), vertical_start + i as u16 - 1),
-                Print(&message[i]),
+                MoveTo(self.horizontally_center_start_position(line, self.current_columns), vertical_start + i as u16 - 1),
+                Print(line),
             )?;
         }
 
@@ -1278,9 +1275,8 @@ impl Screen {
     }
 
     // TODO: Implementation, documentation
-    fn draw_playing_character_fight(&self, game_data: &GameData, game_state: &mut GameState) -> Result<()> {
-
-        Ok(())
+    fn draw_playing_character_fight(&self, _game_data: &GameData, _game_state: &mut GameState) -> Result<()> {
+        todo!();
     }
 
     // Draws the screen specified by VisualState.

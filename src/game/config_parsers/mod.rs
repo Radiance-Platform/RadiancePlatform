@@ -125,13 +125,13 @@ impl GameData {
                 let object_id = map_object.id;
                 let pos_x = map_object.position.x;
                 let pos_y = map_object.position.y;
-                let character = characters.get(&object_id);
-                let object = objects.get(&object_id);
-                if character.is_some() {
-                    map.grid[pos_x][pos_y] = Option::<MapData>::Some(MapData::Character(character.unwrap().to_owned()));
+                let character_opt = characters.get(&object_id);
+                let object_opt = objects.get(&object_id);
+                if let Some(character) = character_opt {
+                    map.grid[pos_x][pos_y] = Option::<MapData>::Some(MapData::Character(character.to_owned()));
                 }
-                if object.is_some() {
-                    map.grid[pos_x][pos_y] = Option::<MapData>::Some(MapData::Object(object.unwrap().to_owned()));
+                if let Some(object) = object_opt {
+                    map.grid[pos_x][pos_y] = Option::<MapData>::Some(MapData::Object(object.to_owned()));
                 }
             }
 
