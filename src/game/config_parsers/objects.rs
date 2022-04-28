@@ -34,7 +34,7 @@ pub fn process_config(objects: &mut HashMap<String, Object>, config_path: &Path)
     for key in object_hash.keys() {
         let val = object_hash.get(key).unwrap_or(key);
         let key_str = key.as_str().unwrap();
-        if val == &Yaml::Null { /* sometimes there are no states/interactions specified */
+        if val == &Yaml::Null { // sometimes there are no states/interactions specified
             continue;
         }
         match key_str {
