@@ -34,7 +34,7 @@ pub fn process_config_serde(map_item_data: &mut Vec<MapItemData>, config_path: &
             map_item_data.push(parsed);
         }
         Err(err) =>{
-            println!("{}",err);
+            eprintln!("{}",err);
         }
     }
     Ok(())

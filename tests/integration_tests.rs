@@ -17,7 +17,7 @@ mod tests {
     fn test_good_room() {
         // This assert would fire and test will fail.
         // Please note, that private functions can be tested too!
-       let mut test_rooms = Vec::<MapItemData>::new();
+       //let mut test_rooms = Vec::<MapItemData>::new();
     }
 
     // Lets us use ? to return quicker when failing
