@@ -2,7 +2,7 @@
 A simple text-based game framework
 
 # Installation
-Head over to [the releases page](https://github.com/Radiance-Platform/RadiancePlatform/releases/) to grab the latest precompiled build of the platform. Download the version for your operating system, and then open the program in your favorite command line terminal. Games can be loaded using the command-line flag like `--config-path example_game/`. The example game will work with any operating system version. 
+Head over to [the releases page](https://github.com/Radiance-Platform/RadiancePlatform/releases/) to grab the latest precompiled build of the platform. Download the version for your operating system, and then open the program in your favorite command line terminal. Games can be loaded using the command-line flag like `./radiance --config-path example_game/` or `radiance.exe --config-path example_game/`. The example game will work with any operating system version. 
 
 # Running for Development
 First, ensure you have a working Rust installation with cargo. See https://www.rust-lang.org/tools/install
