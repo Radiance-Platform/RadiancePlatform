@@ -2,8 +2,7 @@ use std::collections::HashMap;
 use std::fs;
 use std::path::Path;
 use serde::{Serialize,Deserialize};
-use crate::game::characters::{Character};
-use crate::game::characters::role::Role;
+use crate::game::characters::{Character, interactions};
 use crate::game::characters::attribute::Attribute;
 use crate::game::objects::Object;
 
@@ -26,13 +25,17 @@ pub fn process_config_serde(characters: &mut HashMap<String, Character>, config_
 // Converts temporary data structure in to a Character structure and adds it to the characters list
 // so that it can later be added to the game map.
 fn get_character_from_data(characters: &mut HashMap<String, Character>, data: CharacterData) {
+    let interactions = interactions::Interactions {
+        attacks: vec![],
+        object_use: vec![],
+    };
     let mut character = Character{
         id: "".to_string(),
         name: "".to_string(),
-        role: Role { role: "".to_string() },
         attributes: vec![],
         inventory: vec![],
         icon: ' ',
+        interactions,
         dialog_id: "".to_string(),
     };
     character.inventory.resize(data.inventory_size.width as usize, vec![] );
@@ -43,10 +46,9 @@ fn get_character_from_data(characters: &mut HashMap<String, Character>, data: Ch
     character.name = data.name;
     character.icon = data.icon;
     character.dialog_id = data.dialog_id;
-    //character.role = data.role;
     for attribute_data in data.traits {
         let attribute = Attribute {
-            name: attribute_data.name,
+            id: attribute_data.id,
             display_name: attribute_data.display_name,
             min_val: 0,
             max_val: attribute_data.max_value,
@@ -54,11 +56,36 @@ fn get_character_from_data(characters: &mut HashMap<String, Character>, data: Ch
         };
         character.attributes.push(attribute);
     }
+    for object_use_data in data.interactions.object_use {
+        let object_use = interactions::ObjectUse {
+            object_id: object_use_data.object_id,
+            set_dialog: object_use_data.set_dialog,
+            consume_item: object_use_data.consume_item,
+        };
+        character.interactions.object_use.push(object_use);
+    }
+    for attack_data in data.interactions.attacks {
+        let mut attack = interactions::Attack {
+            id: attack_data.id,
+            display_name: attack_data.display_name,
+            base_damage: attack_data.base_damage,
+            affected_by: vec![],
+        };
+        for modifier_data in attack_data.affected_by {
+            let sign = modifier_data.effect_per_point.chars().next().unwrap();
+            let value: f32 = modifier_data.effect_per_point[1..].parse().unwrap();
+            attack.affected_by.push(interactions::Modifier {
+                attribute_id: modifier_data.attribute_id,
+                sign,
+                value,
+            });
+        }
+        character.interactions.attacks.push(attack);
+    }
     characters.insert(character.id.clone(), character);
 }
 
-// Temporary data structure CharacterData is used for Serde parsing and nothing else.
-
+// Temporary data structure that is used for Serde parsing and nothing else
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CharacterData {
     pub id: String,
@@ -78,7 +105,7 @@ pub struct InventorySize {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Trait {
-    pub name: String,
+    pub id: String,
     pub display_name: String,
     pub starting_value: u8,
     pub max_value: u8,
@@ -87,11 +114,12 @@ pub struct Trait {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Interactions {
     pub attacks: Vec<Attack>,
+    pub object_use: Vec<ObjectUseData>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Attack {
-    pub name: String,
+    pub id: String,
     pub display_name: String,
     pub base_damage: i64,
     pub affected_by: Vec<AffectedBy>,
@@ -99,6 +127,13 @@ pub struct Attack {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct AffectedBy {
-    pub skill: String,
+    pub attribute_id: String,
     pub effect_per_point: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct ObjectUseData {
+    pub object_id: String,
+    pub set_dialog: String,
+    pub consume_item: bool,
 }

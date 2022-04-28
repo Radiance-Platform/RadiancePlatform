@@ -1,13 +1,12 @@
 use std::ffi::OsStr;
-use crate::game::maps::{Map, MapInfo};
 use walkdir::WalkDir;
+use crate::game::config_parsers::maps::MapItemData;
+use crate::game::maps::{Map, MapInfo, MapData};
 use crate::game::characters::Character;
 use crate::game::objects::Object;
-use crate::game::maps::MapData;
 use crate::game::dialogs::Dialog;
 use std::collections::HashMap;
 use std::error::Error;
-use crate::game::config_parsers::maps::MapItemData;
 
 mod characters;
 mod game;
@@ -58,7 +57,7 @@ impl GameData {
 
         game_data.scan_config(config_path).expect("Error scanning configuration files, aborting!");
 
-        return game_data;
+        game_data
     }
 
     // Scans the provided configuration path and calls the type-specific configuration parsers on each file
@@ -106,7 +105,7 @@ impl GameData {
     }
 
     // Takes the MapItemData, characters list, and objects list and inserts the characters and objects
-    //     in the right spaces in the game map
+    // in the right spaces in the game map
     fn set_map_grid(&mut self, map_item_data: Vec<MapItemData>, characters: HashMap<String, Character>,
                                                                 objects: HashMap< String, Object> ) -> Result<(), Box<dyn Error>> {
         for map_item in map_item_data {
@@ -126,13 +125,13 @@ impl GameData {
                 let object_id = map_object.id;
                 let pos_x = map_object.position.x;
                 let pos_y = map_object.position.y;
-                let character = characters.get(&object_id);
-                let object = objects.get(&object_id);
-                if character.is_some() {
-                    map.grid[pos_x][pos_y] = Option::<MapData>::Some(MapData::Character(character.unwrap().to_owned()));
+                let character_opt = characters.get(&object_id);
+                let object_opt = objects.get(&object_id);
+                if let Some(character) = character_opt {
+                    map.grid[pos_x][pos_y] = Option::<MapData>::Some(MapData::Character(character.to_owned()));
                 }
-                if object.is_some() {
-                    map.grid[pos_x][pos_y] = Option::<MapData>::Some(MapData::Object(object.unwrap().to_owned()));
+                if let Some(object) = object_opt {
+                    map.grid[pos_x][pos_y] = Option::<MapData>::Some(MapData::Object(object.to_owned()));
                 }
             }
 

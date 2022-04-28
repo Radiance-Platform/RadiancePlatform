@@ -16,8 +16,6 @@ struct Args {
 }
 
 fn main() {
-    println!("Hello, Radiance!");
-
     // Make sure we have arguments or compiled-in
     // TODO: Some way to compile config files in, might need a custom build script or something
     let args = Args::parse();

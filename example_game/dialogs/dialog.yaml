@@ -14,3 +14,11 @@
    option_1:
       dialog: "I will fight you for the key"
       next: "fight"
+ - id: "AA give hat"
+   npc_dialog: "This is an awesome hat, thanks."
+   option_0:
+      dialog: "Cool, bye."
+      next: "exit"
+   option_1:
+      dialog: "Bye."
+      next: "exit"

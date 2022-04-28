@@ -1,7 +1,7 @@
 use serde::Deserialize;
 
 // Dialog data structure. Contains a single dialog object consisting of
-//    some NPC dialog and two dialog options for the player.
+// some NPC dialog and two dialog options for the player.
 
 #[derive(Debug, Clone, Deserialize)]
 pub struct Dialog {

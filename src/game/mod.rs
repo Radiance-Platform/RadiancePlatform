@@ -1,7 +1,7 @@
 use std::process::exit;
 use config_parsers::GameData;
-use crate::game::screen::{Screen, VisualState};
 use crossterm::{event::{Event, KeyCode}, Result};
+use crate::game::screen::{Screen, VisualState};
 
 pub mod characters;
 pub mod dialogs;
@@ -51,7 +51,7 @@ impl Game {
             dialog_return_cancel: VisualState::StartScreen,
         };
 
-        return Game{game_data, game_state, screen};
+        Game{game_data, game_state, screen}
     }
 
     /// Start playing the game by drawing the first screen, then running the main game loop
@@ -135,10 +135,10 @@ pub struct GameState {
 impl GameState {
     // Converts a map ID into an actual map object index
     // TODO: Move to maps module
-    pub fn map_from_id(game_data: &GameData, map_id: &String) -> usize {
+    pub fn map_from_id(game_data: &GameData, map_id: &str) -> usize {
         // Find the map that has an ID matching the provided map_id string by searching all maps
         for i in 0..game_data.maps.len() {
-            if game_data.maps[i].info.id == map_id.to_string() {
+            if game_data.maps[i].info.id == *map_id {
                 return i;
             }
         }

@@ -18,7 +18,7 @@ Maps can be transitioned between using doors (a `type` of `object`). Object refe
 | Field       | Required? | Valid Values                                                                  | Description                                                                 |
 |-------------|-----------|-------------------------------------------------------------------------------|-----------------------------------------------------------------------------|
 | id          | Yes       | An `id` string from an `object` defined in the `objects` configuration folder | This is how maps reference other game entities for inclusion in the map     |
-| position    | Yes       | x: integer and y: integer, must be within the map's `size`                    | This is how maps known where to locate individual objects within themselves |
+| position    | Yes       | x: integer and y: integer, must be within the map's `size`                    | This is how maps know where to locate individual objects within themselves |
 
 
 

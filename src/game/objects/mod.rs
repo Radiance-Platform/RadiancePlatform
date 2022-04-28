@@ -1,18 +1,13 @@
 use serde::{Serialize,Deserialize};
 
+// Object data structure. These are items found in the game maps, or given to the player
+// via an interaction. These make up the majority of the game's interactivity.
+
 #[derive(Clone, Debug)]
 pub struct ObjectState {
     pub name: String,
     pub value: bool
 }
-
-
-/*#[derive(Clone, Debug)]
-pub struct ObjectInteraction {
-    pub category: ObjectInteractionCategory,
-    pub values: String
-}*/
-
 
 #[derive(Clone, Debug)]
 pub enum ObjectInteraction {
@@ -39,7 +34,7 @@ pub struct ObjectInteractionWorld {
 
 }
 
-// TODO: Object's categories should probably be some sort of type rather than arbitrary strings
+// TODO: Future Enhancement: Object's categories should probably be some sort of type rather than arbitrary strings
 /*pub enum ObjectCategory {
 "simple",
 "collidable"
@@ -59,23 +54,23 @@ pub struct Object {
 
 impl Object {
     // Checks a list of state prereqs to see if they are all met in the object.
-    pub fn prereqs_met(&self, prereqs: &Vec<ObjectState>) -> bool {
+    pub fn prereqs_met(&self, prereqs: &[ObjectState]) -> bool {
         for prereq in prereqs {
             if self.get_state(&prereq.name) != prereq.value {
                 return false;
             }
         }
-        return true;
+        true
     }
 
     // Returns state value from state id
-    pub fn get_state(&self, state_name: &String) -> bool {
+    pub fn get_state(&self, state_name: &str) -> bool {
         for s in &self.state {
             if s.name.eq(state_name) {
                 return s.value;
             }
         }
-        return false;
+        false
     }
 
     // Sets state with state_name to state_val.
