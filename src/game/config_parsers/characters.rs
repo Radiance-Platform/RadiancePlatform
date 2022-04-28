@@ -16,7 +16,7 @@ pub fn process_config_serde(characters: &mut HashMap<String, Character>, config_
             get_character_from_data( characters, parsed);
         }
         Err(err) =>{
-            println!("{}", err);
+            eprintln!("{}", err);
         }
     }
     Ok(())
